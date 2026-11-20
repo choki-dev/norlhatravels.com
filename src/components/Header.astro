@@ -1,0 +1,155 @@
+---
+import Logo from './Logo.astro';
+import { nav } from '../data/site.js';
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+const items = [{ label: 'Home', href: '/' }, ...nav];
+const mobileItems = [...items, { label: 'Tailor-Made Journeys', href: '/tailor-made/' }];
+---
+
+<header class="site-header" data-header>
+  <div class="bar">
+    <a href="/" class="brand" aria-label="NorLha — home"><Logo size={78} badge /></a>
+
+    <div class="right">
+      <nav class="nav" aria-label="Main">
+        <ul>
+          {items.map((item) => (
+            <li><a href={item.href} class:list={{ active: isActive(item.href) }} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <a href="/contact/" class:list={['cta', { active: isActive('/contact/') }]} aria-current={isActive('/contact/') ? 'page' : undefined}>Contact Us</a>
+
+      <button class="burger" type="button" aria-expanded="false" aria-controls="mobile-menu" data-burger>
+        <span class="sr">Menu</span><i></i><i></i><i></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile" id="mobile-menu" data-mobile hidden>
+    <ul>
+      {mobileItems.map((item) => <li><a href={item.href} class:list={{ active: isActive(item.href) }}>{item.label}</a></li>)}
+    </ul>
+    <a href="/contact/" class="btn btn-solid">Contact Us <span class="arrow">→</span></a>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]')!;
+  const menu = document.querySelector<HTMLElement>('[data-mobile]')!;
+
+  const onScroll = () => header.classList.toggle('solid', window.scrollY > 60);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  burger.addEventListener('click', () => {
+    const open = burger.getAttribute('aria-expanded') !== 'true';
+    burger.setAttribute('aria-expanded', String(open));
+    menu.hidden = !open;
+    header.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+</script>
+
+<style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    color: #fff;
+    transition: background 0.5s var(--ease), color 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  }
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 -50px 0;
+    background: linear-gradient(180deg, rgba(20, 16, 12, 0.42), transparent);
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease);
+  }
+  .site-header.solid, .site-header.open { background: var(--paper-2); color: var(--ink); box-shadow: 0 1px 0 var(--line), 0 6px 24px -18px rgba(29, 26, 22, 0.35); }
+  .site-header.solid::before, .site-header.open::before { opacity: 0; }
+
+  .bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 100px;
+    padding: 0 clamp(20px, 3vw, 48px);
+    transition: height 0.5s var(--ease);
+  }
+  .solid .bar { height: 76px; }
+  .solid .brand :global(.logo), .open .brand :global(.logo) { box-shadow: none; }
+  .solid .brand :global(img), .open .brand :global(img) { width: 56px; height: 56px; }
+  .right { display: flex; align-items: center; gap: clamp(22px, 2.4vw, 40px); }
+
+  .nav ul { display: flex; gap: clamp(18px, 1.9vw, 30px); }
+  .nav a {
+    font-family: var(--label);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 6px 0;
+    position: relative;
+  }
+  .nav a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s var(--ease);
+  }
+  .nav a:hover::after, .nav a.active::after { transform: scaleX(1); transform-origin: left; }
+  .solid .nav a.active, .solid .nav a:hover { color: var(--saffron); }
+
+  /* Pill button: outlined white over the photo, solid gold once the bar is ivory */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 11px 24px;
+    border-radius: 999px;
+    font-family: var(--label);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    transition: background 0.35s var(--ease), color 0.35s var(--ease), border-color 0.35s var(--ease);
+  }
+  .cta:hover, .cta.active { background: #fff; color: var(--ink); border-color: #fff; }
+  .solid .cta { background: var(--saffron); border-color: var(--saffron); color: #fff; }
+  .solid .cta:hover, .solid .cta.active { background: var(--maroon); border-color: var(--maroon); color: #fff; }
+
+  .burger { display: none; position: relative; width: 44px; height: 44px; background: none; border: 0; color: inherit; cursor: pointer; }
+  .burger i { position: absolute; left: 10px; right: 10px; height: 1px; background: currentColor; transition: transform 0.35s var(--ease), top 0.35s var(--ease), opacity 0.2s; }
+  .burger i:nth-of-type(1) { top: 15px; }
+  .burger i:nth-of-type(2) { top: 21px; right: 18px; }
+  .burger i:nth-of-type(3) { top: 27px; }
+  .burger[aria-expanded='true'] i:nth-of-type(1) { top: 21px; transform: rotate(45deg); }
+  .burger[aria-expanded='true'] i:nth-of-type(2) { opacity: 0; }
+  .burger[aria-expanded='true'] i:nth-of-type(3) { top: 21px; transform: rotate(-45deg); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  .mobile { position: fixed; inset: 76px 0 0 0; background: var(--paper-2); color: var(--ink); overflow-y: auto; padding: 20px clamp(20px, 5vw, 56px) 48px; }
+  .mobile ul { margin-bottom: 32px; }
+  .mobile li a { display: block; font-family: var(--serif); font-size: 28px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .mobile li a.active { color: var(--saffron); }
+
+  @media (max-width: 1400px) {
+    .nav, .cta { display: none; }
+    .burger { display: block; }
+    .bar, .solid .bar { height: 76px; }
+    .brand :global(img) { width: 56px; height: 56px; }
+  }
+</style>

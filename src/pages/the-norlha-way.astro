@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Photo from '../components/Photo.astro';
+import CtaBand from '../components/CtaBand.astro';
+
+const principles = [
+  { t: 'Personally curated', photo: 'way-curated', tone: 'dawn', p: ['There is no single way to experience Bhutan.', 'Your journey begins with a conversation about what interests you, how you like to travel, and what you hope to experience.', 'From there, we create.'] },
+  { t: 'Privately experienced', photo: 'way-private', tone: 'valley', p: ['Your time in Bhutan should belong to you.', 'Private arrangements allow you to travel with greater freedom and flexibility, without being tied to a large group’s schedule.', 'Pause when you want. Stay longer when something captures your imagination. Change the rhythm of your day.'] },
+  { t: 'Deeply Bhutanese', photo: 'way-bhutanese', tone: 'dzong', p: ['The most valuable part of Bhutan is not always its most famous landmark. It is the culture behind it.', 'The people. The stories. The traditions. The spirituality. The everyday moments.', 'We create opportunities to experience Bhutan beyond sightseeing.'] },
+  { t: 'Thoughtfully refined', photo: 'way-refined', tone: 'dusk', p: ['Luxury is personal.', 'For some, it is an exceptional hotel surrounded by mountains. For others, it is a private experience, a beautiful meal, or simply having time with nowhere else to be.', 'We focus on the details that make a journey feel comfortable, effortless and special.'] },
+  { t: 'Responsibly experienced', photo: 'way-responsible', tone: 'forest', p: ['Bhutan’s natural and cultural heritage deserves respect.', 'We encourage our travelers to engage thoughtfully with local communities, traditions and the environment.', 'Because discovering a place should also mean helping preserve what makes it special.'] },
+];
+---
+
+<Base title="The NorLha Way" description="Travel slowly. Discover deeply. The five principles behind every NorLha journey in Bhutan.">
+  <Hero photo="way-hero" alt="Clouds drifting through a Himalayan valley" tone="snow" eyebrow="The NorLha Way" title="Travel slowly. <em>Discover deeply.</em>" sub="We believe the finest journeys are not about how much ground you cover. They are about how deeply you experience a place." />
+
+  <section class="section-tight">
+    <div class="wrap-narrow center reveal">
+      <p class="verse">That belief shapes every NorLha journey.</p>
+    </div>
+  </section>
+
+  {principles.map((x, i) => (
+    <section class:list={['principle', { alt: i % 2 === 1 }]}>
+      <div class="wrap split">
+        <Photo name={x.photo} alt={x.t} tone={x.tone} class="pp reveal" sizes="(max-width: 860px) 100vw, 50vw" />
+        <div class="reveal">
+          <span class="big-num">0{i + 1}</span>
+          <h2 class="h2">{x.t}</h2>
+          <span class="ornament"></span>
+          {x.p.map((p, k) => <p class:list={[k === 0 ? 'lede' : 'muted']}>{p}</p>)}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="section bg-pine">
+    <div class="wrap-narrow center reveal">
+      <span class="eyebrow">The NorLha difference</span>
+      <h2 class="h2" style="margin-top:24px">We don’t simply arrange a trip to Bhutan. <em>We create a way for you to experience it.</em></h2>
+    </div>
+  </section>
+
+  <CtaBand title="Begin with a conversation." text="Tell us how you like to travel, and we will take it from there." photo="way-cta" tone="dusk" />
+</Base>
+
+<style>
+  .principle { padding: clamp(60px, 8vw, 110px) 0; }
+  .principle.alt { background: var(--paper-2); }
+  .principle.alt :global(.pp) { order: 2; }
+  .principle :global(.pp) { aspect-ratio: 5 / 4; }
+  .big-num { display: block; font-family: var(--serif); font-style: italic; font-size: 64px; line-height: 1; color: var(--saffron); margin-bottom: 18px; }
+  @media (max-width: 860px) { .principle.alt :global(.pp) { order: 0; } }
+</style>

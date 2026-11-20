@@ -1,0 +1,76 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import Photo from '../../components/Photo.astro';
+import StyleCard from '../../components/StyleCard.astro';
+import EnquiryForm from '../../components/EnquiryForm.astro';
+import { styles } from '../../data/styles.js';
+
+export function getStaticPaths() {
+  return styles.map((s) => ({ params: { slug: s.slug }, props: { style: s } }));
+}
+
+const { style: s } = Astro.props;
+const others = styles.filter((x) => x.slug !== s.slug).slice(0, 3);
+---
+
+<Base title={s.title} description={s.summary}>
+  <Hero photo={s.photo} alt={s.title} tone={s.tone} eyebrow={s.eyebrow ?? s.tags} title={s.headline} sub={s.title}>
+    <a href="#enquire" class="btn btn-saffron">{s.cta ?? 'Plan your journey'} <span class="arrow">→</span></a>
+  </Hero>
+
+  <section class="section">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="eyebrow">{s.title}</span>
+        {s.lead ? (
+          <div class="verse lead">{s.lead.map((p: string) => <p>{p}</p>)}</div>
+        ) : (
+          <p class="verse lead">{s.summary}</p>
+        )}
+      </div>
+      <Photo name={`${s.photo}-2`} alt={s.title} tone={s.tone} class="side-photo reveal" sizes="(max-width: 860px) 100vw, 50vw" />
+    </div>
+  </section>
+
+  {s.sections.map((sec: any, i: number) => (
+    <section class:list={['section', { 'bg-2': i % 2 === 0 }]}>
+      <div class="wrap split top">
+        <div class="reveal">
+          <span class="eyebrow">0{i + 1}</span>
+          <h2 class="h2" style="margin-top:18px">{sec.heading}</h2>
+        </div>
+        <div class="reveal">
+          {sec.paras.map((p: string, k: number) => <p class:list={[k === 0 ? 'lede' : 'muted']}>{p}</p>)}
+          {sec.list && <ul class="ticks" style="margin-top:20px">{sec.list.map((li: string) => <li>{li}</li>)}</ul>}
+          {sec.after && <p class="after">{sec.after}</p>}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="section bg-pine" id="plan">
+    <div class="wrap split top">
+      <div class="reveal">
+        <span class="eyebrow">{s.closing?.heading ?? 'Made for you'}</span>
+        <h2 class="h2" style="margin:22px 0 26px">{s.closing?.text ?? 'Every journey is shaped around your preferences, pace and the experiences that matter to you.'}</h2>
+        <p class="lede">Share a few details and we will reply personally with ideas for your {s.title.toLowerCase()} journey.</p>
+      </div>
+      <div class="reveal form-card"><EnquiryForm style={s.title} /></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="head reveal"><span class="eyebrow">More ways to travel</span><h2 class="h2" style="margin-top:22px">Explore Bhutan your way.</h2></div>
+      <div class="grid grid-3">{others.map((o) => <div class="reveal"><StyleCard style={o} short /></div>)}</div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lead { margin-top: 24px; }
+  :global(.side-photo) { aspect-ratio: 4 / 5; }
+  .after { font-family: var(--serif); font-style: italic; font-size: 26px; color: var(--maroon); margin-top: 28px; }
+  .form-card { background: var(--paper); color: var(--ink); padding: clamp(28px, 4vw, 52px); }
+</style>

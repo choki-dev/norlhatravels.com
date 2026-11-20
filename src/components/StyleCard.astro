@@ -1,0 +1,30 @@
+---
+import Photo from './Photo.astro';
+interface Props { style: any; short?: boolean }
+const { style: s, short = false } = Astro.props;
+---
+
+<a href={`/explore/${s.slug}/`} class="style">
+  <div class="media">
+    <Photo name={s.photo} alt={s.title} tone={s.tone} sizes="(max-width: 640px) 100vw, 33vw" />
+  </div>
+  <div class="text">
+    <span class="tags">{s.tags}</span>
+    <h3>{s.title}</h3>
+    <p>{short ? s.short : s.summary}</p>
+    <span class="link more">Read more</span>
+  </div>
+</a>
+
+<style>
+  .style { display: flex; flex-direction: column; height: 100%; }
+  .media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; }
+  .media :global(.photo) { position: absolute; inset: 0; transition: transform 1.6s var(--ease); }
+  .style:hover .media :global(.photo) { transform: scale(1.04); }
+  .text { padding-top: 24px; display: flex; flex-direction: column; flex: 1; }
+  .tags { font-family: var(--label); font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+  h3 { margin-top: 10px; font-size: clamp(24px, 2.2vw, 30px); }
+  p { margin: 12px 0 0; font-size: 16px; line-height: 1.6; }
+  .more { margin-top: auto; padding-top: 18px; align-self: flex-start; }
+  .style:hover .more { gap: 12px; color: var(--maroon); }
+</style>

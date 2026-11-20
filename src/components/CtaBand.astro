@@ -1,0 +1,27 @@
+---
+import Photo from './Photo.astro';
+interface Props { eyebrow?: string; title: string; text?: string; button?: string; href?: string; photo?: string; tone?: any }
+const { eyebrow = 'Begin your journey', title, text, button = 'Plan your private journey', href = '/tailor-made/#enquire', photo = 'himalaya', tone = 'dusk' } = Astro.props;
+---
+
+<section class="band on-dark">
+  <Photo name={photo} alt="Himalayan landscape in Bhutan" tone={tone} />
+  <div class="veil"></div>
+  <div class="inner wrap-narrow center reveal">
+    <span class="eyebrow">{eyebrow}</span>
+    <h2 class="h2" set:html={title} />
+    {text && <p class="lede">{text}</p>}
+    <a href={href} class="btn btn-light">{button}</a>
+  </div>
+</section>
+
+<style>
+  .band { position: relative; color: #fff; min-height: 72svh; display: flex; align-items: center; padding: clamp(110px, 12vw, 170px) 0; overflow: hidden; }
+  .band :global(.photo) { position: absolute; inset: 0; }
+  .veil { position: absolute; inset: 0; background: rgba(20, 16, 12, 0.38); }
+  .inner { position: relative; }
+  .eyebrow { color: #fff; margin-bottom: 18px; }
+  h2 { font-size: clamp(34px, 3.8vw, 52px); }
+  .lede { color: rgba(255, 255, 255, 0.9); margin: 20px auto 34px; max-width: 44ch; }
+  h2 + .btn { margin-top: 34px; }
+</style>

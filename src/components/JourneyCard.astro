@@ -1,0 +1,33 @@
+---
+import Photo from './Photo.astro';
+interface Props { journey: any; large?: boolean }
+const { journey: j, large = false } = Astro.props;
+---
+
+<a href={`/journeys/${j.slug}/`} class:list={['card', { large }]}>
+  <div class="media">
+    <Photo name={j.photo} alt={`${j.title} — ${j.route.join(', ')}`} tone={j.tone} sizes="(max-width: 640px) 100vw, 50vw" />
+  </div>
+  <div class="body">
+    <span class="meta">{j.days} days · {j.nights} nights{j.signature && ' · Signature'}</span>
+    <h3>{j.title}</h3>
+    <span class="route">{j.route.join(' · ')}</span>
+    {large && <p>{j.summary}</p>}
+    <span class="link more">Read more</span>
+  </div>
+</a>
+
+<style>
+  .card { display: flex; flex-direction: column; height: 100%; }
+  .media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+  .large .media { aspect-ratio: 3 / 2; }
+  .media :global(.photo) { position: absolute; inset: 0; transition: transform 1.6s var(--ease); }
+  .card:hover .media :global(.photo) { transform: scale(1.04); }
+  .body { padding-top: 24px; display: flex; flex-direction: column; flex: 1; }
+  .meta { font-family: var(--label); font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+  h3 { margin-top: 10px; font-size: clamp(24px, 2.2vw, 30px); }
+  .route { margin-top: 6px; font-size: 15px; color: var(--ink-mute); }
+  p { margin: 16px 0 0; font-size: 16px; }
+  .more { margin-top: auto; padding-top: 20px; align-self: flex-start; }
+  .card:hover .more { gap: 12px; color: var(--maroon); }
+</style>

@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "norlha-website",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    // Only the API runs through the worker; every page is served as a static file.
+    "run_worker_first": ["/api/*"]
+  }
+  // Optional: set ENQUIRY_WEBHOOK_URL with `wrangler secret put ENQUIRY_WEBHOOK_URL`
+  // to forward enquiries (e.g. to a form/email service, Slack or a CRM webhook).
+}

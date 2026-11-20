@@ -1,0 +1,64 @@
+---
+// Shows a real photograph if one exists at src/assets/photos/<name>.(jpg|jpeg|png|webp|avif).
+// Otherwise renders an atmospheric placeholder so the layout can be reviewed before photography arrives.
+import { Image } from 'astro:assets';
+
+interface Props {
+  name: string;
+  alt: string;
+  tone?: 'dawn' | 'valley' | 'dzong' | 'forest' | 'dusk' | 'snow';
+  class?: string;
+  eager?: boolean;
+  sizes?: string;
+}
+
+const { name, alt, tone = 'valley', class: cls = '', eager = false, sizes = '100vw' } = Astro.props;
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../assets/photos/*.{jpg,jpeg,png,webp,avif}', { eager: true });
+const match = Object.entries(files).find(([path]) => path.replace(/^.*\//, '').replace(/\.[^.]+$/, '') === name);
+const img = match?.[1].default;
+---
+
+<div class:list={['photo', `tone-${tone}`, cls]}>
+  {
+    img ? (
+      <Image src={img} alt={alt} widths={[640, 1024, 1600, 2400]} sizes={sizes} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'auto'} />
+    ) : (
+      <div class="ph" role="img" aria-label={alt}>
+        <svg class="ridges" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true">
+          <path class="r1" d="M0 230 L120 150 L210 200 L330 90 L450 190 L560 120 L700 210 L820 110 L960 200 L1080 140 L1200 190 L1200 400 L0 400 Z" />
+          <path class="r2" d="M0 290 L140 220 L260 270 L390 200 L520 260 L650 210 L790 280 L930 220 L1060 270 L1200 230 L1200 400 L0 400 Z" />
+          <path class="r3" d="M0 340 L180 300 L340 330 L500 290 L680 335 L860 300 L1030 330 L1200 305 L1200 400 L0 400 Z" />
+        </svg>
+        <span class="ph-label">Photograph · {name.replace(/-/g, ' ')}</span>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .photo { position: relative; overflow: hidden; background: var(--paper-3); }
+  .photo :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .ph { position: absolute; inset: 0; }
+  .ridges { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 62%; }
+  .ridges path { fill: currentColor; }
+  .r1 { opacity: 0.28; }
+  .r2 { opacity: 0.5; }
+  .r3 { opacity: 0.85; }
+  .ph-label {
+    position: absolute;
+    left: 18px;
+    bottom: 14px;
+    font-family: var(--sans);
+    font-size: 10.5px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .tone-dawn .ph { background: radial-gradient(120% 80% at 70% 20%, #f3d9b0 0%, transparent 60%), linear-gradient(180deg, #e7c39b 0%, #b67c5c 55%, #5a3f3a 100%); color: #3b2a29; }
+  .tone-valley .ph { background: radial-gradient(110% 70% at 30% 15%, #e6e8cf 0%, transparent 55%), linear-gradient(180deg, #b9c4a7 0%, #6c8366 55%, #2a3f33 100%); color: #1f2f27; }
+  .tone-dzong .ph { background: radial-gradient(100% 70% at 60% 10%, #f1dfbf 0%, transparent 55%), linear-gradient(180deg, #dcc39c 0%, #a2613f 55%, #432826 100%); color: #2e1b1a; }
+  .tone-forest .ph { background: radial-gradient(110% 70% at 40% 10%, #d6e0d3 0%, transparent 55%), linear-gradient(180deg, #9fb3a3 0%, #46635a 55%, #172820 100%); color: #12201a; }
+  .tone-dusk .ph { background: radial-gradient(120% 70% at 75% 15%, #f0c7a4 0%, transparent 50%), linear-gradient(180deg, #c99d9e 0%, #6c4b66 55%, #1f2134 100%); color: #181a2a; }
+  .tone-snow .ph { background: radial-gradient(120% 80% at 50% 10%, #ffffff 0%, transparent 55%), linear-gradient(180deg, #e8edf0 0%, #a3b3bd 55%, #3f4e5a 100%); color: #2c3943; }
+</style>

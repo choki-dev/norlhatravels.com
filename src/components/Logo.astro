@@ -1,0 +1,16 @@
+---
+// NorLha circular gold logo (public/norlha-logo.png, made from NorLha_Logo.png).
+// `badge` sets it on a white disc, as the logo was designed (gold on white),
+// so it stays legible over photos and dark backgrounds.
+interface Props { class?: string; size?: number; badge?: boolean }
+const { class: cls = '', size = 72, badge = false } = Astro.props;
+---
+<span class:list={['logo', { badge }, cls]} style={`--logo-size:${size}px`}>
+  <img src="/norlha-logo.png" alt="NorLha" width={size} height={size} />
+</span>
+
+<style>
+  .logo { display: inline-flex; line-height: 0; border-radius: 50%; transition: width 0.45s var(--ease), height 0.45s var(--ease); }
+  img { width: var(--logo-size); height: var(--logo-size); transition: width 0.45s var(--ease), height 0.45s var(--ease); }
+  .badge { background: #fff; padding: 3px; box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.45); }
+</style>

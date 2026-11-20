@@ -1,0 +1,101 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Photo from '../components/Photo.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+
+const steps = [
+  { t: 'Tell us what inspires you', p: 'Share your interests, travel dates, preferred pace, expectations and the experiences you have in mind.' },
+  { t: 'We curate', p: 'We combine your ideas with our knowledge of Bhutan to create a thoughtful itinerary.' },
+  { t: 'Refine', p: 'We adjust the pace, accommodation, experiences and details until the journey feels right.' },
+  { t: 'Experience', p: 'Once you arrive, we take care of the journey while you concentrate on being present.' },
+];
+const includes = ['Culture and heritage', 'Himalayan trekking', 'Wellness and spirituality', 'Photography', 'Food and local cuisine', 'Festivals', 'Wildlife and nature', 'Family experiences', 'Romance and honeymoons', 'Private celebrations', 'Or simply time away from everything'];
+---
+
+<Base title="Tailor-Made Journeys" description="Don't choose a package. Create a journey. Tailor-made private travel in Bhutan, planned with you in four simple steps.">
+  <Hero photo="tailor-hero" alt="A traveler looking out over a Bhutanese valley" tone="dawn" eyebrow="Tailor-made journeys" title="Don’t choose a package. <em>Create a journey.</em>" sub="Your Bhutan. Your way.">
+    <a href="#enquire" class="btn btn-saffron">Start planning <span class="arrow">→</span></a>
+  </Hero>
+
+  <section class="section">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="eyebrow">It begins with a conversation</span>
+        <p class="lede" style="margin-top:22px">A great journey begins before you arrive. It begins with a conversation.</p>
+        <span class="ornament"></span>
+        <p class="muted">We start there.</p>
+      </div>
+      <div class="reveal verse questions">
+        <p>What brings you to Bhutan?</p>
+        <p>What do you want to discover?</p>
+        <p>How do you like to travel?</p>
+        <p>What would make your journey memorable?</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-pine">
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="eyebrow">The process</span>
+        <h2 class="h2" style="margin-top:22px">Four steps to your journey.</h2>
+      </div>
+      <ol class="steps">
+        {steps.map((s, i) => (
+          <li class="reveal" style={`transition-delay:${i * 100}ms`}>
+            <span class="sn">0{i + 1}</span>
+            <h3 class="h4">{s.t}</h3>
+            <p>{s.p}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap split">
+      <Photo name="tailor-includes" alt="A Bhutanese festival dancer in costume" tone="dzong" class="inc-photo reveal" sizes="(max-width: 860px) 100vw, 50vw" />
+      <div class="reveal">
+        <span class="eyebrow">What can your journey include?</span>
+        <h2 class="h2" style="margin:22px 0 28px">There is no required formula.</h2>
+        <div class="chips">{includes.map((x) => <span class="chip">{x}</span>)}</div>
+        <span class="ornament"></span>
+        <h3 class="h4">Your journey, personally curated</h3>
+        <p class="muted" style="margin-top:12px">We arrange the elements of your journey around your preferences and availability, including accommodation, transportation, guiding and experiences.</p>
+        <p class="pull">You decide what matters. We take care of the details.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-2">
+    <div class="wrap split top">
+      <div class="reveal intro">
+        <span class="eyebrow">Start planning</span>
+        <h2 class="h2" style="margin:22px 0 26px">No template. No fixed formula. <em>Simply your Bhutan.</em></h2>
+        <p class="lede">Tell us as much or as little as you like. We will reply personally with ideas and a first outline of your journey.</p>
+      </div>
+      <div class="reveal"><EnquiryForm /></div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .questions p { font-style: italic; }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--line); }
+  .steps li { padding: 36px 28px 8px 0; position: relative; }
+  .steps li + li { padding-left: 28px; border-left: 1px solid var(--line); }
+  .sn { display: block; font-family: var(--serif); font-size: 56px; line-height: 1; color: var(--saffron-soft); margin-bottom: 26px; }
+  .steps h3 { margin-bottom: 14px; }
+  .steps p { color: var(--ink-soft); font-size: 16px; }
+  @media (max-width: 960px) {
+    .steps { grid-template-columns: 1fr 1fr; }
+    .steps li + li:nth-child(3) { border-left: 0; padding-left: 0; }
+  }
+  @media (max-width: 560px) {
+    .steps { grid-template-columns: 1fr; }
+    .steps li, .steps li + li { border-left: 0; padding-left: 0; border-bottom: 1px solid var(--line); padding-bottom: 28px; }
+  }
+  :global(.inc-photo) { aspect-ratio: 4 / 5; }
+  .pull { font-family: var(--serif); font-style: italic; font-size: 26px; color: var(--maroon); margin-top: 22px; }
+</style>

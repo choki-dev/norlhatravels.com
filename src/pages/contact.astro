@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { site } from '../data/site.js';
+---
+
+<Base title="Contact Us" description="Contact NorLha Tours & Travels to begin planning your private journey in Bhutan.">
+  <Hero size="medium" photo="contact-hero" alt="Prayer flags above a mountain pass" tone="snow" eyebrow="Contact us" title="Let’s begin <em>a conversation.</em>" sub="Tell us what you are looking for, and let us create a journey around it." />
+
+  <section class="section">
+    <div class="wrap layout">
+      <aside class="reveal details">
+        <div>
+          <span class="eyebrow">Write to us</span>
+          <a class="big" href={`mailto:${site.email}`}>{site.email}</a>
+        </div>
+        <div>
+          <span class="eyebrow">Call or WhatsApp</span>
+          <a class="big" href={`tel:${site.phone.replace(/\s/g, '')}`}>{site.phone}</a>
+          <a class="small" href={`https://wa.me/${site.whatsapp.replace(/\D/g, '')}`} rel="noopener">Message on WhatsApp →</a>
+        </div>
+        <div>
+          <span class="eyebrow">Visit us</span>
+          <address>{site.address.map((l) => <span>{l}</span>)}</address>
+          <p class="small muted">{site.hours}</p>
+        </div>
+        <div>
+          <span class="eyebrow">Follow</span>
+          <ul class="social">{site.social.map((s) => <li><a href={s.href} rel="noopener">{s.label}</a></li>)}</ul>
+        </div>
+      </aside>
+
+      <div class="reveal">
+        <span class="eyebrow">Enquiry</span>
+        <h2 class="h2" style="margin:22px 0 40px">Plan your private journey.</h2>
+        <EnquiryForm />
+      </div>
+    </div>
+  </section>
+
+  <section class="map">
+    <iframe src={site.mapEmbed} title="NorLha office location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </section>
+</Base>
+
+<style>
+  .layout { display: grid; grid-template-columns: 360px 1fr; gap: clamp(48px, 8vw, 120px); align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+  .details { display: flex; flex-direction: column; gap: 40px; padding-top: 8px; }
+  .details .eyebrow { display: block; margin-bottom: 12px; }
+  .big { display: block; font-family: var(--serif); font-size: 28px; line-height: 1.3; word-break: break-word; }
+  .big:hover { color: var(--maroon); }
+  .small { font-size: 14px; display: inline-block; margin-top: 8px; }
+  address { font-style: normal; font-family: var(--serif); font-size: 22px; line-height: 1.45; display: flex; flex-direction: column; }
+  .social { display: flex; gap: 20px; flex-wrap: wrap; }
+  .social a { border-bottom: 1px solid var(--line); padding-bottom: 3px; }
+  .map { height: 440px; background: var(--paper-2); }
+  .map iframe { width: 100%; height: 100%; border: 0; filter: grayscale(0.6) sepia(0.15); }
+</style>

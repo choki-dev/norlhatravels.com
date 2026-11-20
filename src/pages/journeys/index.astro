@@ -1,0 +1,84 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import JourneyCard from '../../components/JourneyCard.astro';
+import StyleCard from '../../components/StyleCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { journeys } from '../../data/journeys.js';
+import { styles } from '../../data/styles.js';
+
+const signature = journeys.find((j) => j.signature)!;
+const others = journeys.filter((j) => !j.signature);
+const adapt = ['Extend your stay.', 'Change the pace.', 'Add a trek.', 'Spend longer in a valley.', 'Include a festival.', 'Upgrade your accommodation.', 'Create a private celebration.', 'Or start from a completely blank page.'];
+---
+
+<Base title="Bhutan Journeys" description="Five private signature journeys across Bhutan, from 3 to 10 days — thoughtfully curated, flexible by design.">
+  <Hero photo="journeys-hero" alt="A winding mountain road through Bhutan" tone="valley" eyebrow="Bhutan Journeys" title="Discover Bhutan, <em>your way.</em>" sub="Bhutan reveals itself slowly." />
+
+  <section class="section">
+    <div class="wrap split top">
+      <div class="reveal"><p class="lede">Beyond its dramatic mountains lie ancient monasteries, secluded valleys, vibrant festivals, timeless traditions and warm hospitality.</p></div>
+      <div class="reveal">
+        <p class="muted">Our journeys are thoughtfully designed starting points, created to introduce you to the many sides of Bhutan.</p>
+        <p class="pull">Choose a journey that speaks to you, then make it your own.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-2" id="signature">
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="eyebrow">Our signature journeys</span>
+        <h2 class="h2" style="margin-top:22px">Private journeys. Thoughtfully curated. <em>Flexible by design.</em></h2>
+      </div>
+
+      <div class="feature reveal"><JourneyCard journey={signature} large /></div>
+
+      <div class="grid grid-2 rest">
+        {others.map((j, i) => <div class="reveal" style={`transition-delay:${(i % 2) * 100}ms`}><JourneyCard journey={j} large /></div>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="head center reveal">
+        <span class="eyebrow">Explore Bhutan your way</span>
+        <h2 class="h2" style="margin-top:22px">Travel styles, not fixed packages.</h2>
+        <p class="lede">Beyond our signature journeys, discover Bhutan through experiences shaped around your interests, travel style and preferences.</p>
+      </div>
+      <div class="grid grid-3">
+        {styles.map((s, i) => <div class="reveal" style={`transition-delay:${(i % 3) * 90}ms`}><StyleCard style={s} /></div>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-pine">
+    <div class="wrap split">
+      <div class="reveal">
+        <span class="eyebrow">Make it yours</span>
+        <h2 class="h2" style="margin:22px 0 28px">Your journey doesn’t have to fit a package.</h2>
+        <p class="lede">Every NorLha journey can be adapted around your interests, preferences and expectations.</p>
+        <a href="/tailor-made/#enquire" class="btn btn-saffron" style="margin-top:36px">Create your journey <span class="arrow">→</span></a>
+      </div>
+      <ul class="adapt reveal">{adapt.map((a) => <li>{a}</li>)}</ul>
+    </div>
+  </section>
+
+  <CtaBand title="Not sure where to begin?" text="Tell us a little about yourself and we will suggest a journey — or create one from a blank page." button="Talk to us" photo="journeys-cta" tone="forest" />
+</Base>
+
+<style>
+  .pull { font-family: var(--serif); font-style: italic; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.35; color: var(--maroon); margin-top: 18px; }
+  .feature { margin-bottom: clamp(56px, 6vw, 80px); }
+  .feature :global(.card) { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0; align-items: stretch; }
+  .feature :global(.media) { aspect-ratio: 16 / 11; }
+  .feature :global(.card) { gap: clamp(32px, 5vw, 72px); align-items: center; }
+  .feature :global(.body) { padding: 0; justify-content: center; }
+  .feature :global(.body h3) { font-size: clamp(28px, 2.6vw, 38px); }
+  .feature :global(.more) { margin-top: 24px; }
+  @media (max-width: 860px) { .feature :global(.card) { grid-template-columns: 1fr; } }
+  .rest { row-gap: clamp(56px, 6vw, 80px); }
+  .adapt li { font-family: var(--serif); font-size: clamp(22px, 2.2vw, 30px); padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .adapt li:last-child { font-style: italic; color: var(--saffron-soft); }
+</style>

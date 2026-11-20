@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import StyleCard from '../../components/StyleCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { styles } from '../../data/styles.js';
+---
+
+<Base title="Explore Bhutan Your Way" description="Luxury, cultural, adventure, romance, family and wellness journeys in Bhutan — travel styles shaped around you, not fixed packages.">
+  <Hero photo="explore-hero" alt="A Bhutanese valley at golden hour" tone="dusk" eyebrow="Explore Bhutan your way" title="Shaped around <em>how you travel.</em>" sub="Beyond our signature journeys, discover Bhutan through experiences shaped around your interests, travel style and preferences." />
+
+  <section class="section">
+    <div class="wrap">
+      <div class="grid grid-3">
+        {styles.map((s, i) => <div class="reveal" style={`transition-delay:${(i % 3) * 90}ms`}><StyleCard style={s} /></div>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight bg-2">
+    <div class="wrap-narrow center reveal">
+      <span class="eyebrow">Tailor-Made Bhutan</span>
+      <h2 class="h2" style="margin:22px 0 24px">No template. No fixed formula. <em>Simply your journey.</em></h2>
+      <a href="/tailor-made/" class="link">How tailor-made works <span>→</span></a>
+    </div>
+  </section>
+
+  <CtaBand title="Tell us what inspires you." photo="explore-cta" tone="valley" button="Start planning" />
+</Base>

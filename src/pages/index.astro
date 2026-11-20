@@ -1,0 +1,656 @@
+---
+// Home page — content from "NorLha_Website_Content and Concept.docx", PAGE 1 — HOME (trimmed to a minimal selection).
+// Layout: hero → centred intro + photo carousel → journeys mosaic → travel-styles brochure →
+// NorLha Way (photos beside principles) → illustrated destinations map → the NorLha Promise.
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import Photo from '../components/Photo.astro';
+import { site } from '../data/site.js';
+import { journeys } from '../data/journeys.js';
+import { styles } from '../data/styles.js';
+import { destinations } from '../data/destinations.js';
+import { bhutanDistricts } from '../data/bhutan-map.js';
+
+// Hero slideshow — photos crossfade in this order (names are files in src/assets/photos)
+const heroSlides = [
+  { photo: 'hero-himalaya', alt: 'Sunrise over prayer flags on a Bhutanese mountain ridge', tone: 'dawn' },
+  { photo: 'tigers-nest', alt: 'Tiger’s Nest Monastery on its cliff above Paro Valley', tone: 'forest' },
+  { photo: 'punakha-dzong', alt: 'Punakha Dzong at the meeting of two rivers', tone: 'valley' },
+  { photo: 'dochula', alt: 'Chortens on Dochula Pass', tone: 'snow' },
+  { photo: 'phobjikha', alt: 'The Phobjikha valley', tone: 'forest' },
+];
+
+// THE NORLHA WAY — five principles, one line each (sentences from the original copy)
+const pillars = [
+  { t: 'Personally curated', line: 'We shape the journey around you.' },
+  { t: 'Privately experienced', line: 'The freedom to experience Bhutan without being tied to someone else’s schedule.' },
+  { t: 'Thoughtfully selected', line: 'Where you stay and how you travel are part of the experience.' },
+  { t: 'Locally connected', line: 'Bhutan is best experienced through its people.' },
+  { t: 'Seamlessly arranged', line: 'The best journeys feel effortless.' },
+];
+
+// YOUR BHUTAN, PERSONALLY CURATED — six experiences, as listed on the home page
+const experiences = [
+  { t: 'Luxury Bhutan', p: 'Comfort, privacy and exceptional experiences, thoughtfully combined.', href: '/explore/luxury-bhutan/', photo: 'luxury', tone: 'dusk' },
+  { t: 'Cultural Journeys', p: 'Discover Bhutan’s history, spirituality, architecture, traditions and people.', href: '/explore/cultural-bhutan/', photo: 'culture', tone: 'dzong' },
+  { t: 'Himalayan Adventures', p: 'Experience Bhutan’s mountains, forests, valleys and trails.', href: '/explore/himalayan-adventures/', photo: 'trek', tone: 'snow' },
+  { t: 'Romance & Honeymoons', p: 'Private journeys designed around two people and their story.', href: '/explore/romance-and-honeymoons/', photo: 'romance', tone: 'dawn' },
+  { t: 'Family Journeys', p: 'Meaningful experiences designed for every generation.', href: '/explore/family-journeys/', photo: 'family', tone: 'valley' },
+  // Not a travel style in styles.js, so its brochure page carries its own tags and headline (from the Tailor-Made page)
+  { t: 'Tailor-Made Bhutan', p: 'No template. No fixed formula. Simply your journey.', href: '/tailor-made/', photo: 'tailor-hero', tone: 'forest', tags: 'Private · Bespoke', headline: 'Don’t choose a package. Create a journey.' },
+];
+
+// Bhutan Journeys mosaic — the signature journey takes the large tile, the rest follow in order
+const journeyTiles = [...journeys.filter((j) => j.signature), ...journeys.filter((j) => !j.signature)];
+
+// Small line icons for the social links in the Promise section
+const socialIcon: Record<string, string> = {
+  Facebook: '<path d="M14 8h2.5V4.5H14c-2.2 0-4 1.8-4 4V11H8v3.5h2V21h3.5v-6.5H16l.5-3.5h-3V8.8c0-.4.3-.8.5-.8z" />',
+  Instagram: '<rect x="4" y="4" width="16" height="16" rx="4.5" /><circle cx="12" cy="12" r="3.8" /><circle cx="17" cy="7" r="0.9" class="dot" />',
+  YouTube: '<rect x="3" y="6" width="18" height="12" rx="3.5" /><path d="M10.5 9.6v4.8l4-2.4z" class="dot" />',
+};
+
+// Only show social icons that have a real address (placeholders are '#' in site.js)
+const liveSocial = site.social.filter((sn) => sn.href && sn.href !== '#');
+
+// Photo carousel in the introduction — alternating tall / short frames
+const gallery = [
+  { photo: 'punakha-dzong', alt: 'Punakha Dzong at the meeting of two rivers', tone: 'valley' },
+  { photo: 'paro-valley', alt: 'The Paro valley', tone: 'dawn' },
+  { photo: 'prayer-flags', alt: 'Prayer flags on a suspension bridge', tone: 'dawn' },
+  { photo: 'trongsa', alt: 'Trongsa Dzong above the valley', tone: 'dzong' },
+  { photo: 'culture-2', alt: 'Bhutanese cultural life', tone: 'dzong' },
+  { photo: 'phobjikha', alt: 'Black-necked cranes over Phobjikha', tone: 'forest' },
+  { photo: 'trek-2', alt: 'A Himalayan trail', tone: 'snow' },
+  { photo: 'thimphu', alt: 'Thimphu valley', tone: 'valley' },
+  { photo: 'wellness-2', alt: 'A quiet moment in Bhutan', tone: 'dusk' },
+  { photo: 'eastern-bhutan', alt: 'The hills of eastern Bhutan', tone: 'forest' },
+];
+
+// Brochure pages — each experience, enriched with its travel-style tags, headline and summary
+const brochure = experiences.map((e) => {
+  const st = styles.find((x) => e.href === `/explore/${x.slug}/`);
+  return { title: e.t, href: e.href, photo: e.photo, tone: e.tone, tags: st?.tags ?? e.tags, headline: st?.headline ?? e.headline, text: st?.summary ?? e.p };
+});
+
+// DESTINATIONS MAP — soft stylised Bhutan, real town positions, one dashed journey line,
+// round photo markers set just off the route (connected by a fine leader line).
+// Coordinates are [longitude, latitude]; the outline is simplified and illustrative.
+const W = 1000, H = 556;
+const proj = ([lon, lat]: number[]) => [((lon - 88.7) / 3.45) * W, ((28.35 - lat) / 1.7) * H];
+const f = (n: number) => n.toFixed(1);
+// Smooth curve through points (Catmull-Rom → cubic Bézier)
+const smooth = (pts: number[][], closed = false) => {
+  const n = pts.length;
+  const at = (i: number) => (closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))]);
+  let d = `M${f(pts[0][0])},${f(pts[0][1])}`;
+  for (let i = 0; i < (closed ? n : n - 1); i++) {
+    const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+    d += ` C${f(p1[0] + (p2[0] - p0[0]) / 6)},${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)},${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])},${f(p2[1])}`;
+  }
+  return closed ? d + ' Z' : d;
+};
+const placeLL: Record<string, number[]> = {
+  haa: [89.28, 27.37], paro: [89.41, 27.43], thimphu: [89.64, 27.47], punakha: [89.86, 27.59], phobjikha: [90.18, 27.46],
+  trongsa: [90.51, 27.5], bumthang: [90.75, 27.55], 'eastern-bhutan': [91.55, 27.33],
+};
+// Where each round photo marker sits relative to its town (map units) and which side its name goes
+const callout: Record<string, { dx: number; dy: number; side: 'left' | 'right' }> = {
+  haa: { dx: -70, dy: 100, side: 'left' }, paro: { dx: -70, dy: -95, side: 'left' }, thimphu: { dx: 30, dy: 125, side: 'left' },
+  punakha: { dx: -20, dy: -115, side: 'left' }, phobjikha: { dx: 60, dy: 110, side: 'right' }, trongsa: { dx: -30, dy: -120, side: 'right' },
+  bumthang: { dx: 90, dy: -100, side: 'right' }, 'eastern-bhutan': { dx: 0, dy: -95, side: 'right' },
+};
+// A destination without coordinates is left off the map (with a build warning) instead of breaking the build;
+// one without a callout gets a default marker position above its town.
+const pins = destinations.flatMap((d) => {
+  if (!placeLL[d.id]) {
+    console.warn(`[home map] No coordinates for destination "${d.id}" — add it to placeLL in src/pages/index.astro`);
+    return [];
+  }
+  const [x, y] = proj(placeLL[d.id]);
+  const c = callout[d.id] ?? { dx: 0, dy: -100, side: 'right' as const };
+  return [{ ...d, x, y, cx: x + c.dx, cy: y + c.dy, side: c.side }];
+});
+const pinById = Object.fromEntries(pins.map((p) => [p.id, p]));
+// One journey line through the kingdom, west to east (skipping any stop that isn't on the map)
+const chain = ['haa', 'paro', 'thimphu', 'punakha', 'phobjikha', 'trongsa', 'bumthang', 'eastern-bhutan'].filter((id) => pinById[id]);
+const chainPts = chain.map((id) => [pinById[id].x, pinById[id].y]);
+const journeyLine = smooth(chainPts);
+// Approximate driving times — adjust freely.
+const notes: Record<string, string> = {
+  'haa|paro': 'via Chele La · approx. 2.5 hrs', 'paro|thimphu': 'approx. 1 hr', 'punakha|thimphu': 'via Dochula Pass · approx. 2.5 hrs',
+  'phobjikha|punakha': 'approx. 3 hrs', 'phobjikha|trongsa': 'via Pele La · approx. 3 hrs', 'bumthang|trongsa': 'via Yotong La · approx. 2.5 hrs',
+  'bumthang|eastern-bhutan': 'via Thrumshing La · a full day',
+};
+const routes = chain.slice(0, -1).map((a, i) => {
+  const b = chain[i + 1];
+  const seg = smooth([chainPts[Math.max(0, i - 1)], chainPts[i], chainPts[i + 1], chainPts[Math.min(chain.length - 1, i + 2)]]);
+  // keep only the middle piece of the 4-point curve (the stretch between a and b) — identical to that stretch of the full line
+  const parts = seg.split(' C');
+  const d = `M${f(chainPts[i][0])},${f(chainPts[i][1])} C${parts[2]}`;
+  const A = pinById[a], B = pinById[b];
+  return { a, b, d, note: notes[[a, b].sort().join('|')], label: `${A.name} – ${B.name}`, lx: (A.x + B.x) / 2, ly: (A.y + B.y) / 2 + 26 };
+});
+---
+
+<Base>
+  <!-- 1. Opening -->
+  <Hero size="full" photo="hero-himalaya" alt="Sunrise over prayer flags on a Bhutanese mountain ridge" tone="dawn" title="NorLha" tagline="Bhutan, your way." slides={heroSlides} />
+
+  <!-- 2. Introduction — centred heading and copy, then a photo carousel -->
+  <section class="intro" id="start">
+    <div class="wrap">
+      <div class="intro-inner reveal">
+        <span class="eyebrow">Your journey. Your pace. Your Bhutan.</span>
+        <h2 class="h2 intro-title">Private journeys, thoughtfully curated around you.</h2>
+        <div class="intro-copy">
+          <p>Some journeys are about seeing as much as possible. Others are about experiencing a place deeply.</p>
+          <p>At NorLha, we believe Bhutan belongs in the second category.</p>
+          <p>We create private journeys that bring together Bhutan’s extraordinary landscapes, living traditions, spiritual heritage, warm hospitality, and remarkable places to stay—at a pace that feels right for you.</p>
+          <p>From the first conversation to the moment you leave Bhutan, every detail is thoughtfully considered.</p>
+        </div>
+        <a href="/about/" class="link intro-btn">About NorLha</a>
+      </div>
+    </div>
+
+    <!-- Photo carousel: alternating tall / short frames, bleeding off both edges -->
+    <div class="carousel reveal" data-carousel>
+      <div class="c-track" data-track tabindex="0" aria-label="Photographs of Bhutan — scroll sideways">
+        {gallery.map((g, i) => (
+          <figure class:list={['c-item', i % 2 === 0 ? 'tall' : 'short']}>
+            <Photo name={g.photo} alt={g.alt} tone={g.tone as any} sizes="(max-width: 760px) 70vw, 400px" />
+          </figure>
+        ))}
+      </div>
+      <button type="button" class="c-btn c-prev" data-prev aria-label="Previous photographs">‹</button>
+      <button type="button" class="c-btn c-next" data-next aria-label="Next photographs">›</button>
+      <span class="c-cursor" aria-hidden="true" data-cursor><i>‹</i><i>›</i></span>
+    </div>
+  </section>
+
+  <!-- 3. Bhutan Journeys — mosaic: one tall tile + 2×2 -->
+  <section class="section bg-2 jr">
+    <div class="wrap">
+      <div class="jr-head reveal">
+        <div>
+          <span class="eyebrow">Bhutan Journeys</span>
+          <h2 class="h2">Discover Bhutan, your way.</h2>
+        </div>
+        <a href="/journeys/" class="link">View all journeys</a>
+      </div>
+      <div class="jr-grid">
+        {journeyTiles.map((j, i) => (
+          <a href={`/journeys/${j.slug}/`} class:list={['jr-tile reveal', { 'jr-big': i === 0 }]} style={`transition-delay:${i * 80}ms`}>
+            <Photo name={j.photo} alt={`${j.title} — ${j.route.join(', ')}`} tone={j.tone} sizes={i === 0 ? '(max-width: 860px) 100vw, 40vw' : '(max-width: 860px) 100vw, 30vw'} />
+            <span class="jr-shade" aria-hidden="true"></span>
+            <span class="jr-body">
+              <span class="jr-label">{j.days} days · {j.nights} nights{j.signature ? ' · Signature' : ''}</span>
+              <span class="jr-title">{j.title}</span>
+              <span class="jr-meta"><span>{[...new Set(j.route)].join(' · ')}</span><span class="jr-arrow" aria-hidden="true">→</span></span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Your Bhutan, personally curated — coverflow: the chosen style in front, the others fanning out smaller behind it -->
+  <section class="section bro" data-cf>
+    <div class="wrap">
+      <div class="head center reveal">
+        <span class="eyebrow">Explore Bhutan your way</span>
+        <h2 class="h2">Your Bhutan, personally curated.</h2>
+      </div>
+    </div>
+
+    <div class="cf-wrap reveal">
+    <div class="cf" aria-roledescription="carousel" aria-label="Travel styles">
+      <ul class="cf-track" data-track>
+        {brochure.map((b, i) => (
+          <li class="cf-card" data-card aria-label={`${i + 1} of ${brochure.length}: ${b.title}`}>
+            <Photo name={b.photo} alt="" tone={b.tone as any} sizes="(max-width: 760px) 74vw, 340px" />
+            <span class="cf-shade" aria-hidden="true"></span>
+            <div class="cf-body on-dark">
+              {b.tags && <span class="cf-label">{b.tags}</span>}
+              <h3 class="cf-title">{b.title}</h3>
+              <div class="cf-more">
+                <div class="cf-more-in">
+                  <p class="cf-text">{b.headline ? `${b.headline} ` : ''}{b.text}</p>
+                  <a href={b.href} class="link" data-explore>Explore</a>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+      <!-- arrows sit outside the masked strip so the edge fade doesn't dim them -->
+      <button type="button" class="cf-arrow cf-prev" data-prev aria-label="Previous travel style">←</button>
+      <button type="button" class="cf-arrow cf-next" data-next aria-label="Next travel style">→</button>
+    </div>
+
+    <div class="cf-cta">
+      <a href="/tailor-made/#enquire" class="cf-cta-btn">Customize your journey</a>
+    </div>
+  </section>
+
+  <!-- 5. The NorLha Way — portrait photo beside a hairline list -->
+  <section class="section bg-2">
+    <div class="wrap way">
+      <div class="way-photos">
+        <Photo name="way-curated" alt="A quiet moment in a Bhutanese valley" tone="valley" class="wp-big reveal" sizes="(max-width: 860px) 100vw, 40vw" />
+        <Photo name="tigers-nest" alt="Tiger’s Nest Monastery on its cliff above Paro Valley" tone="forest" class="wp-small reveal" sizes="(max-width: 860px) 60vw, 22vw" />
+      </div>
+      <div class="way-text reveal">
+        <span class="eyebrow">The NorLha Way</span>
+        <h2 class="h2">Travel slowly. <em>Discover deeply.</em></h2>
+        <p>Bhutan rewards those who take their time.</p>
+        <ul class="way-list">
+          {pillars.map((x) => (
+            <li><span class="w-t">{x.t}</span><span class="w-l">{x.line}</span></li>
+          ))}
+        </ul>
+        <a href="/the-norlha-way/" class="link">Read more</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Destinations — soft illustrated map with photo markers -->
+  <section class="section dmap" data-map>
+    <div class="wrap">
+      <div class="head center reveal">
+        <span class="eyebrow">Destinations</span>
+        <h2 class="h2">Bhutan, beyond the expected.</h2>
+        <p class="lede">From the cultural heart of Paro and Thimphu to the peaceful valleys of Punakha, Phobjikha and Bumthang, every part of Bhutan offers something different.</p>
+        <a href="/destinations/" class="link dm-more">Learn more</a>
+      </div>
+
+        <div class="dm-map reveal">
+          <svg viewBox={`0 0 ${W} ${H}`} role="group" aria-label="Illustrated map of Bhutan with NorLha destinations">
+            <g class="dm-land">
+              {bhutanDistricts.map((d) => <path d={d.d}><title>{d.name}</title></path>)}
+            </g>
+            <text class="dm-country" x="660" y="440" text-anchor="middle">Bhutan</text>
+
+            <path class="dm-journey" d={journeyLine} />
+
+            {routes.map((r) => (
+              <g class="dm-route" data-a={r.a} data-b={r.b} tabindex="0" role="button" aria-label={`${r.label}, ${r.note}`}>
+                <path class="dm-hit" d={r.d} />
+                <path class="dm-line" d={r.d} />
+                <text class="dm-note" x={r.lx} y={r.ly} text-anchor="middle">{r.note}</text>
+              </g>
+            ))}
+
+            {pins.map((p) => (
+              <g class="dm-town" data-town={p.id}>
+                <line class="dm-leader" x1={p.x} y1={p.y} x2={p.cx} y2={p.cy} />
+                <circle class="dm-dot" cx={p.x} cy={p.y} r="4" />
+              </g>
+            ))}
+          </svg>
+
+          {pins.map((p) => (
+            <a href={`/destinations/#${p.id}`} class:list={['dm-marker', `side-${p.side}`]} data-id={p.id}
+              style={`left:${((p.cx / W) * 100).toFixed(2)}%;top:${((p.cy / H) * 100).toFixed(2)}%`} aria-label={`${p.name} — open on the Destinations page`}>
+              <span class="dm-circle"><Photo name={p.photo} alt="" tone={p.tone as any} sizes="120px" /></span>
+              <span class="dm-name">{p.name}</span>
+            </a>
+          ))}
+          <small class="dm-credit">Map data © <a href="https://www.geoboundaries.org" rel="noopener" target="_blank">geoBoundaries</a> (CC BY 4.0)</small>
+        </div>
+        <!-- phones: the map is too small for town names, so list them underneath -->
+        <ul class="dm-list">
+          {pins.map((p) => (
+            <li><a href={`/destinations/#${p.id}`}>{p.name}</a></li>
+          ))}
+        </ul>
+    </div>
+  </section>
+
+  <!-- 7. The NorLha Promise — simple: heading, two lines, social icons -->
+  <section class="promise">
+    <div class="wrap-narrow pr-inner reveal">
+      <h2 class="pr-title">We take care of the details.</h2>
+      <p class="pr-text">We listen carefully. We plan thoughtfully. We remain flexible.<br />Our role is simple: to make your journey feel effortless, personal and deeply memorable.</p>
+      <a href="/tailor-made/#enquire" class="link pr-cta">Customize your journey</a>
+      {liveSocial.length > 0 && (
+        <ul class="pr-social">
+          {liveSocial.map((sn) => (
+            <li><a href={sn.href} rel="noopener" target="_blank" aria-label={`NorLha on ${sn.label}`}><svg viewBox="0 0 24 24" aria-hidden="true" set:html={socialIcon[sn.label] ?? ''} /></a></li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+</Base>
+
+<script>
+
+  // Travel styles coverflow: arrows, ← → keys, swipe, or click a side card to bring it to the front
+  const cfRoot = document.querySelector<HTMLElement>('[data-cf]');
+  if (cfRoot) {
+    const cards = [...cfRoot.querySelectorAll<HTMLElement>('[data-card]')];
+    const n = cards.length;
+    const X = [0, 0.74, 1.34, 1.8]; // horizontal offset per step, in card widths
+    let cur = 0;
+    const layout = () => {
+      cards.forEach((c, k) => {
+        const d = ((k - cur + n + Math.floor(n / 2)) % n) - Math.floor(n / 2); // -3..2 for six cards
+        const a = Math.abs(d);
+        c.style.setProperty('--x', String(Math.sign(d) * X[Math.min(a, 3)]));
+        c.style.setProperty('--s', String(1 - a * 0.12));
+        c.style.zIndex = String(10 - a);
+        c.dataset.d = String(Math.min(a, 3));
+        c.setAttribute('aria-hidden', d === 0 ? 'false' : 'true');
+        c.querySelector('[data-explore]')!.setAttribute('tabindex', d === 0 ? '0' : '-1');
+      });
+    };
+    const go = (to: number) => { cur = (to + n) % n; layout(); };
+    cfRoot.querySelector('[data-prev]')!.addEventListener('click', () => go(cur - 1));
+    cfRoot.querySelector('[data-next]')!.addEventListener('click', () => go(cur + 1));
+    cards.forEach((c, k) => c.addEventListener('click', (e) => {
+      if (k !== cur) { e.preventDefault(); go(k); }
+    }));
+    cfRoot.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+    });
+    const track = cfRoot.querySelector<HTMLElement>('[data-track]')!;
+    let sx: number | null = null;
+    track.addEventListener('pointerdown', (e) => { sx = e.pointerType === 'mouse' ? null : e.clientX; });
+    track.addEventListener('pointercancel', () => { sx = null; });
+    track.addEventListener('pointerup', (e) => {
+      if (sx === null) return;
+      const dx = e.clientX - sx;
+      sx = null;
+      if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1));
+    });
+    layout();
+  }
+
+  // Destinations map: hovering a place or a stretch of route lights it up; markers link to the Destinations page
+  const dmap = document.querySelector<HTMLElement>('[data-map]');
+  if (dmap) {
+    const markers = [...dmap.querySelectorAll<HTMLElement>('.dm-marker')];
+    const towns = [...dmap.querySelectorAll<SVGGElement>('.dm-town')];
+    const routesEl = [...dmap.querySelectorAll<SVGGElement>('.dm-route')];
+    const light = (ids: string[]) => {
+      markers.forEach((m) => m.classList.toggle('on', ids.includes(m.dataset.id!)));
+      towns.forEach((t) => t.classList.toggle('on', ids.includes(t.dataset.town!)));
+    };
+    const select = (id: string) => {
+      light([id]);
+      routesEl.forEach((r) => { r.classList.toggle('on', r.dataset.a === id || r.dataset.b === id); r.classList.toggle('picked', false); });
+    };
+    const selectRoute = (r: SVGGElement) => {
+      routesEl.forEach((x) => { x.classList.toggle('on', x === r); x.classList.toggle('picked', x === r); });
+      light([r.dataset.a!, r.dataset.b!]);
+    };
+    markers.forEach((m) => {
+      m.addEventListener('mouseenter', () => select(m.dataset.id!));
+      m.addEventListener('focus', () => select(m.dataset.id!));
+    });
+    routesEl.forEach((r) => {
+      r.addEventListener('click', () => selectRoute(r));
+      r.addEventListener('mouseenter', () => selectRoute(r));
+      r.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectRoute(r); }
+      });
+    });
+    select('thimphu');
+  }
+
+  // Intro photo carousel: click left/right half or drag (mouse), swipe (touch), buttons (keyboard)
+  const car = document.querySelector<HTMLElement>('[data-carousel]');
+  if (car) {
+    const track = car.querySelector<HTMLElement>('[data-track]')!;
+    const cursor = car.querySelector<HTMLElement>('[data-cursor]')!;
+    const step = () => {
+      const item = track.querySelector<HTMLElement>('.c-item');
+      return item ? item.offsetWidth + parseFloat(getComputedStyle(track).columnGap || '0') : 400;
+    };
+    const go = (dir: number) => track.scrollBy({ left: dir * step(), behavior: 'smooth' });
+    car.querySelector('[data-prev]')!.addEventListener('click', () => go(-1));
+    car.querySelector('[data-next]')!.addEventListener('click', () => go(1));
+
+    // start part-way in so frames bleed off both edges
+    requestAnimationFrame(() => { track.scrollLeft = step() * 0.55; });
+
+    let down = false, dragged = false, startX = 0, startLeft = 0;
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      down = true; dragged = false; startX = e.clientX; startLeft = track.scrollLeft;
+      track.classList.add('dragging');
+    });
+    window.addEventListener('pointerup', () => { down = false; track.classList.remove('dragging'); });
+    track.addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      const r = car.getBoundingClientRect();
+      cursor.style.transform = `translate(${e.clientX - r.left}px, ${e.clientY - r.top}px)`;
+      cursor.classList.toggle('left', e.clientX - r.left < r.width / 2);
+      if (down) {
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 5) dragged = true;
+        track.scrollLeft = startLeft - dx;
+      }
+    });
+    track.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') car.classList.add('hover'); });
+    track.addEventListener('pointerleave', () => car.classList.remove('hover'));
+    track.addEventListener('click', (e) => {
+      if (dragged) { dragged = false; return; }
+      const r = car.getBoundingClientRect();
+      go(e.clientX - r.left < r.width / 2 ? -1 : 1);
+    });
+  }
+</script>
+
+<style>
+  /* Intro — centred editorial composition */
+  .intro { padding: clamp(96px, 10vw, 140px) 0 clamp(96px, 10vw, 150px); }
+  .intro-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+  .intro-title { margin: 14px auto 22px; max-width: 26ch; }
+  .intro-copy p { margin: 0 auto 0.9em; max-width: 62ch; font-size: 17px; line-height: 1.6; color: var(--ink-soft); }
+  .intro-btn { margin-top: 18px; }
+
+  /* Intro photo carousel */
+  .carousel { position: relative; margin-top: clamp(56px, 6vw, 84px); }
+  .c-track {
+    display: flex; align-items: center; gap: clamp(28px, 3.4vw, 60px);
+    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
+    padding: 0 clamp(20px, 4vw, 60px); scrollbar-width: none; outline: none;
+  }
+  .c-track::-webkit-scrollbar { display: none; }
+  .c-track.dragging { scroll-snap-type: none; user-select: none; }
+  .c-track.dragging .c-item { pointer-events: none; }
+  .c-item { flex: none; width: clamp(240px, 26vw, 400px); margin: 0; scroll-snap-align: center; }
+  .c-item.tall :global(.photo) { aspect-ratio: 389 / 497; }
+  .c-item.short :global(.photo) { aspect-ratio: 390 / 350; }
+  .c-item :global(.photo img) { transition: transform 1.4s var(--ease); pointer-events: none; -webkit-user-drag: none; }
+  .c-item:hover :global(.photo img) { transform: scale(1.03); }
+
+  /* Round black arrow that follows the mouse */
+  .c-cursor {
+    position: absolute; left: 0; top: 0; z-index: 3; width: 66px; height: 66px; margin: -33px 0 0 -33px;
+    border-radius: 50%; background: #111; color: #fff; display: flex; align-items: center; justify-content: center; gap: 12px;
+    font-size: 20px; line-height: 1; pointer-events: none; opacity: 0; scale: 0.6;
+    transition: opacity 0.25s var(--ease), scale 0.3s var(--ease);
+  }
+  .c-cursor i { font-style: normal; transition: opacity 0.2s; }
+  .c-cursor.left i:last-child, .c-cursor:not(.left) i:first-child { opacity: 0.45; }
+  .carousel.hover .c-cursor { opacity: 1; scale: 1; }
+  .carousel.hover .c-track { cursor: none; }
+
+  /* Keyboard buttons — appear when focused */
+  .c-btn { position: absolute; top: 50%; z-index: 4; width: 52px; height: 52px; margin-top: -26px; border-radius: 50%; border: 0; background: #111; color: #fff; font-size: 22px; cursor: pointer; opacity: 0; pointer-events: none; }
+  .c-btn:focus-visible { opacity: 1; pointer-events: auto; }
+  .c-prev { left: 16px; }
+  .c-next { right: 16px; }
+  @media (hover: none) { .c-cursor { display: none; } }
+  @media (max-width: 760px) { .c-item { width: 68vw; } }
+
+  /* Bhutan Journeys — mosaic */
+  .jr-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(32px, 4vw, 48px); }
+  .jr-head h2 { margin-top: 14px; }
+  .jr-grid { display: grid; grid-template-columns: 1.36fr 1fr 1fr; grid-template-rows: repeat(2, clamp(280px, 27vw, 400px)); gap: 16px; }
+  .jr-tile { position: relative; display: block; overflow: hidden; color: #fff; isolation: isolate; }
+  .jr-big { grid-row: 1 / span 2; }
+  .jr-tile :global(.photo) { position: absolute; inset: 0; z-index: -2; transition: transform 1.6s var(--ease); }
+  .jr-tile:hover :global(.photo) { transform: scale(1.05); }
+  .jr-shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(20, 16, 12, 0.18) 0%, rgba(20, 16, 12, 0) 30%, rgba(20, 16, 12, 0.15) 50%, rgba(20, 16, 12, 0.72) 100%); }
+  .jr-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 clamp(22px, 2.6vw, 40px) clamp(22px, 2.4vw, 36px); display: flex; flex-direction: column; }
+  .jr-label { font-family: var(--label); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); }
+  .jr-title { margin-top: 6px; font-family: var(--serif); font-size: clamp(28px, 2.9vw, 44px); line-height: 1.05; letter-spacing: -0.02em; }
+  .jr-big .jr-title { font-size: clamp(34px, 3.6vw, 54px); }
+  .jr-meta { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 16px; padding-top: 14px; font-size: 13.5px; color: rgba(255, 255, 255, 0.85); border-top: 1px solid rgba(255, 255, 255, 0); transition: border-color 0.5s var(--ease); }
+  .jr-arrow { opacity: 0; transform: translateX(-8px); transition: opacity 0.4s var(--ease), transform 0.4s var(--ease); }
+  .jr-tile:hover .jr-meta, .jr-tile:focus-visible .jr-meta { border-color: rgba(255, 255, 255, 0.45); }
+  .jr-tile:hover .jr-arrow, .jr-tile:focus-visible .jr-arrow { opacity: 1; transform: none; }
+  @media (max-width: 960px) {
+    .jr-grid { grid-template-columns: 1fr 1fr; grid-template-rows: none; grid-auto-rows: clamp(260px, 44vw, 360px); }
+    .jr-big { grid-column: 1 / -1; grid-row: auto; }
+  }
+  @media (max-width: 560px) { .jr-grid { grid-template-columns: 1fr; } }
+
+  /* Travel styles — coverflow */
+  .cf { --cw: clamp(280px, 28vw, 400px); position: relative; margin-top: clamp(40px, 4.5vw, 64px); overflow: hidden; padding: 24px 0 36px;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+            mask-image: linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%); }
+  .cf-track { position: relative; height: calc(clamp(260px, 25vw, 350px) * 1.62); /* height kept as before; only the width grew */ margin: 0; padding: 0; list-style: none; touch-action: pan-y; }
+  .cf-card {
+    --x: 0; --s: 1;
+    position: absolute; top: 0; left: 50%; width: var(--cw); height: 100%; margin-left: calc(var(--cw) / -2);
+    overflow: hidden; color: #fff; isolation: isolate; cursor: pointer;
+    box-shadow: 0 24px 44px -26px rgba(25, 18, 8, 0.45);
+    transform: translateX(calc(var(--x) * var(--cw))) scale(var(--s));
+    transition: transform 0.8s var(--ease), opacity 0.6s var(--ease), filter 0.6s var(--ease);
+  }
+  .cf-card[data-d='0'] { cursor: default; }
+  .cf-card[data-d='1'] { filter: brightness(0.9); }
+  .cf-card[data-d='2'] { filter: brightness(0.82); }
+  .cf-card[data-d='3'] { opacity: 0; pointer-events: none; }
+  .cf-card :global(.photo) { position: absolute; inset: 0; z-index: -2; transition: transform 1.6s var(--ease); }
+  .cf-card:hover :global(.photo) { transform: scale(1.05); }
+  /* same shading as the Bhutan Journeys tiles, deepening on hover so the extra text reads */
+  .cf-shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(20, 16, 12, 0.18) 0%, rgba(20, 16, 12, 0) 30%, rgba(20, 16, 12, 0.15) 50%, rgba(20, 16, 12, 0.72) 100%); transition: background-color 0.6s var(--ease); }
+  .cf-card:hover .cf-shade, .cf-card:focus-within .cf-shade { background-color: rgba(20, 16, 12, 0.28); }
+
+  .cf-body { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; padding: 0 clamp(22px, 2.2vw, 32px) clamp(22px, 2.2vw, 30px); }
+  .cf-label { font-family: var(--label); font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); }
+  .cf-title { margin-top: 6px; font-family: var(--serif); font-size: clamp(28px, 2.5vw, 38px); line-height: 1.05; letter-spacing: -0.02em; color: #fff; }
+  /* description + link: collapsed until hover / keyboard focus */
+  .cf-more { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.6s var(--ease), opacity 0.5s var(--ease); }
+  .cf-more-in { min-height: 0; overflow: hidden; }
+  .cf-text { margin: 14px 0 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.45); font-size: 14px; line-height: 1.6; color: rgba(255, 255, 255, 0.88); }
+  .cf-card:hover .cf-more, .cf-card:focus-within .cf-more { grid-template-rows: 1fr; opacity: 1; }
+  /* touch screens can't hover — open the front card's details */
+  @media (hover: none) { .cf-card[data-d='0'] .cf-more { grid-template-rows: 1fr; opacity: 1; } }
+
+  .cf-wrap { --cw: clamp(280px, 28vw, 400px); position: relative; }
+  /* arrows at the left and right of the card fan, vertically centred on it */
+  .cf-arrow {
+    position: absolute; top: 50%; z-index: 20; width: 48px; height: 48px; margin-top: -24px;
+    border: 1px solid rgba(29, 26, 22, 0.25); background: #fff; color: var(--ink); font-size: 18px; line-height: 1; cursor: pointer;
+    transition: background 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+  .cf-arrow:hover, .cf-arrow:focus-visible { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .cf-prev { left: max(12px, calc(50% - var(--cw) * 2.05 - 24px)); }
+  .cf-next { right: max(12px, calc(50% - var(--cw) * 2.05 - 24px)); }
+  .cf-cta { display: flex; justify-content: center; margin-top: 12px; }
+  /* same pill as the header's Contact Us button */
+  .cf-cta-btn { display: inline-flex; align-items: center; padding: 11px 24px; border-radius: 999px; border: 1px solid var(--saffron); background: var(--saffron); color: #fff; font-family: var(--label); font-size: 14px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; transition: background 0.35s var(--ease), border-color 0.35s var(--ease); }
+  .cf-cta-btn:hover, .cf-cta-btn:focus-visible { background: var(--maroon); border-color: var(--maroon); color: #fff; }
+
+  @media (max-width: 760px) {
+    .cf-wrap, .cf { --cw: 72vw; }
+    .cf { -webkit-mask-image: none; mask-image: none; }
+    /* phones: arrows move out from over the cards to a row underneath */
+    .cf-wrap { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+    .cf { flex: 0 0 100%; padding-bottom: 20px; }
+    .cf-arrow { position: static; margin: 0; }
+    .cf-cta { margin-top: 28px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cf-card, .cf-card :global(.photo img) { transition: none; }
+  }
+
+  /* NorLha Way */
+  .way { display: grid; grid-template-columns: 6fr 6fr; gap: clamp(40px, 9vw, 140px); align-items: center; }
+  .way-photos { position: relative; padding-bottom: 24%; }
+  .way-photos :global(.wp-big) { width: 82%; margin-left: auto; aspect-ratio: 4 / 4.6; }
+  .way-photos :global(.wp-small) { position: absolute; left: 0; bottom: 0; width: 52%; aspect-ratio: 4 / 3; }
+  .way-text h2 { margin: 14px 0 18px; }
+  .way-list { margin: 34px 0 32px; border-top: 1px solid var(--line); }
+  .way-list li { display: grid; grid-template-columns: 210px 1fr; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+  .w-t { font-family: var(--label); font-size: 15px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--saffron); }
+  .w-l { font-size: 15px; line-height: 1.55; color: var(--ink-soft); }
+  @media (max-width: 860px) {
+    .way { grid-template-columns: 1fr; }
+    .way-photos { width: 100%; max-width: 540px; margin: 0 auto; } /* keeps the photo pair from towering on tablets */
+    .way-list li { grid-template-columns: 1fr; gap: 4px; }
+  }
+
+  /* Destinations — soft illustrated map */
+  .dm-more { margin-top: 22px; }
+  .dm-credit { position: absolute; right: 0; bottom: -4px; font-size: 11px; color: var(--ink-mute); }
+  .dm-credit a { text-decoration: underline; text-underline-offset: 2px; }
+  /* town list — phones only (on bigger screens the names sit beside the photo markers) */
+  .dm-list { display: none; }
+  @media (max-width: 860px) {
+    .dm-credit { position: static; display: block; margin-top: 10px; text-align: right; }
+    .dm-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+    .dm-list a { display: inline-block; padding: 8px 14px; border: 1px solid var(--line); font-family: var(--label); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); transition: color 0.3s var(--ease), border-color 0.3s var(--ease); }
+    .dm-list a:hover { color: var(--saffron); border-color: var(--saffron); }
+  }
+  .dmap { padding-bottom: clamp(40px, 5vw, 72px); }
+  .dm-map { position: relative; max-width: 1080px; width: 100%; margin: 0 auto; }
+  .dm-map svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .dm-land path { fill: #ece8e1; stroke: #fff; stroke-width: 1.1; stroke-linejoin: round; transition: fill 0.4s var(--ease); }
+  .dm-land path:hover { fill: #e6e0d6; }
+  .dm-country { font-family: var(--sans); font-size: 30px; font-weight: 400; letter-spacing: 0.32em; text-transform: uppercase; fill: #1f2a33; }
+
+  .dm-journey { fill: none; stroke: #55514b; stroke-width: 1.3; stroke-dasharray: 7 6; stroke-linecap: round; }
+  .dm-route { cursor: pointer; outline: none; }
+  .dm-hit { fill: none; stroke: transparent; stroke-width: 22; }
+  .dm-line { fill: none; stroke: var(--saffron); stroke-width: 2.4; stroke-dasharray: 7 6; stroke-linecap: round; opacity: 0; transition: opacity 0.4s var(--ease); }
+  .dm-route.on .dm-line, .dm-route:hover .dm-line, .dm-route:focus-visible .dm-line { opacity: 1; }
+  .dm-note { font-family: var(--label); font-size: 13.5px; font-weight: 500; letter-spacing: 0.04em; fill: var(--maroon); paint-order: stroke; stroke: #ece8e1; stroke-width: 6px; stroke-linejoin: round; opacity: 0; transition: opacity 0.35s var(--ease); pointer-events: none; }
+  .dm-route:hover .dm-note, .dm-route:focus-visible .dm-note, .dm-route.picked .dm-note { opacity: 1; }
+
+  .dm-leader { stroke: #8f8a82; stroke-width: 0.9; stroke-dasharray: 2 3; transition: stroke 0.3s var(--ease); }
+  .dm-dot { fill: #1f2a33; transition: fill 0.3s var(--ease); }
+  .dm-town.on .dm-leader { stroke: var(--saffron); }
+  .dm-town.on .dm-dot { fill: var(--saffron); }
+
+  /* round photo markers (HTML on top of the SVG) */
+  .dm-marker { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 14px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .dm-marker.side-left { flex-direction: row-reverse; }
+  .dm-circle { position: relative; display: block; width: clamp(46px, 7.6vw, 92px); aspect-ratio: 1; border-radius: 50%; overflow: hidden; flex: none; box-shadow: 0 0 0 0 rgba(154, 106, 30, 0); transition: box-shadow 0.4s var(--ease), transform 0.5s var(--ease); }
+  .dm-circle :global(.photo) { position: absolute; inset: 0; }
+  .dm-name { font-family: var(--sans); font-size: clamp(10px, 0.95vw, 12.5px); font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #1f2a33; white-space: nowrap; transition: color 0.3s var(--ease); }
+  /* keep the circle itself centred on its point; the name hangs beside it */
+  .dm-marker.side-right { transform: translate(calc(-1 * clamp(23px, 3.8vw, 46px)), -50%); }
+  .dm-marker.side-left { transform: translate(calc(-100% + clamp(23px, 3.8vw, 46px)), -50%); }
+  .dm-marker:hover .dm-circle, .dm-marker:focus-visible .dm-circle { transform: scale(1.08); }
+  .dm-marker.on .dm-circle { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--saffron); }
+  .dm-marker.on .dm-name, .dm-marker:hover .dm-name { color: var(--saffron); }
+
+
+  @media (max-width: 860px) {
+    .dm-name { display: none; }
+    .dm-marker.side-right, .dm-marker.side-left { transform: translate(-50%, -50%); }
+    .dm-country { font-size: 40px; }
+  }
+
+  /* Promise — simple centred block */
+  .promise { background: #fff; text-align: center; padding: clamp(80px, 9vw, 120px) 0; }
+  .pr-inner { display: flex; flex-direction: column; align-items: center; }
+  .pr-title { font-family: var(--serif); font-size: clamp(22px, 2vw, 28px); font-weight: 600; letter-spacing: 0; color: var(--ink); }
+  .pr-text { margin: 22px auto 0; max-width: 78ch; font-size: 16.5px; line-height: 1.9; color: var(--ink-soft); }
+  .pr-cta { margin-top: 24px; }
+  .pr-social { display: flex; gap: 26px; margin-top: 28px; }
+  .pr-social a { display: grid; place-items: center; width: 28px; height: 28px; color: #b9b6b0; transition: color 0.3s var(--ease); }
+  .pr-social a:hover { color: var(--saffron); }
+  .pr-social svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
+  .pr-social svg :global(.dot) { fill: currentColor; stroke: none; }
+</style>

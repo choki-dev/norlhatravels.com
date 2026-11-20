@@ -1,0 +1,189 @@
+---
+// Full-size hero: just the brand name in wide-tracked serif capitals and the tagline in fine gold caps.
+// Inner-page heroes: centred title over a darkened photo with a small breadcrumb.
+import Photo from './Photo.astro';
+interface Props {
+  photo: string;
+  alt: string;
+  tone?: any;
+  eyebrow?: string;
+  title: string;
+  tagline?: string;
+  sub?: string;
+  size?: 'full' | 'tall' | 'medium';
+  align?: 'left' | 'center';
+  /** Optional slideshow: several photos that crossfade in turn (the first one loads eagerly). */
+  slides?: { photo: string; alt: string; tone?: any }[];
+}
+const { photo, alt, tone, eyebrow, title, tagline, sub, size = 'tall', slides } = Astro.props;
+const show = slides && slides.length > 1 ? slides : null;
+const crumb = Astro.url.pathname.split('/').filter(Boolean);
+---
+
+<section class:list={['hero', `hero-${size}`, 'on-dark']}>
+  {show ? (
+    <div class="slides" data-slides aria-roledescription="slideshow" aria-label="Photographs of Bhutan">
+      {show.map((s, i) => (
+        <Photo name={s.photo} alt={s.alt} tone={s.tone} class={`hero-photo slide${i === 0 ? ' on' : ''}`} eager={i === 0} />
+      ))}
+    </div>
+  ) : (
+    <Photo name={photo} alt={alt} tone={tone} class="hero-photo" eager />
+  )}
+  <div class="shade"></div>
+  {show && (
+    <div class="dots">
+      {show.map((s, i) => (
+        <button type="button" class:list={['dot', { on: i === 0 }]} data-dot aria-label={`Show photo ${i + 1}: ${s.alt}`} aria-pressed={i === 0 ? 'true' : 'false'}></button>
+      ))}
+    </div>
+  )}
+
+  {size === 'full' ? (
+    <div class="full-content">
+      <div class="lockup">
+        <h1 class="brand-name" data-brand>{title}</h1>
+        {tagline && <p class="tagline" data-tagline>{tagline}</p>}
+      </div>
+    </div>
+  ) : (
+    <div class="content wrap">
+      {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+      <h1 class="h1" set:html={title.replace('|', ' ')} />
+      {sub && <p class="sub-c">{sub}</p>}
+      <div class="actions center-actions"><slot /></div>
+      {crumb.length > 0 && (
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          {crumb.map((c) => <><span>/</span><span>{c.replace(/-/g, ' ')}</span></>)}
+        </nav>
+      )}
+    </div>
+  )}
+</section>
+
+<script>
+  // Hero slideshow: crossfade to the next photo every few seconds; the dots jump to a photo.
+  // Pauses while the tab is hidden, and doesn't auto-advance for people who prefer reduced motion.
+  const slideRoot = document.querySelector<HTMLElement>('[data-slides]');
+  if (slideRoot) {
+    const slides = [...slideRoot.querySelectorAll<HTMLElement>('.slide')];
+    const dots = [...document.querySelectorAll<HTMLButtonElement>('[data-dot]')];
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let cur = 0;
+    let timer: number | undefined;
+    const go = (n: number) => {
+      cur = (n + slides.length) % slides.length;
+      slides.forEach((s, k) => s.classList.toggle('on', k === cur));
+      dots.forEach((d, k) => { d.classList.toggle('on', k === cur); d.setAttribute('aria-pressed', k === cur ? 'true' : 'false'); });
+    };
+    const start = () => { if (!still) { clearInterval(timer); timer = window.setInterval(() => go(cur + 1), 6500); } };
+    dots.forEach((d, k) => d.addEventListener('click', () => { go(k); start(); }));
+    document.addEventListener('visibilitychange', () => (document.hidden ? clearInterval(timer) : start()));
+    start();
+  }
+
+  // Make NORLHA start and end exactly where the tagline does, by setting its letter-spacing.
+  const brand = document.querySelector<HTMLElement>('[data-brand]');
+  const tag = document.querySelector<HTMLElement>('[data-tagline]');
+  if (brand && tag) {
+    const natural = (el: HTMLElement) => {
+      const probe = document.createElement('span');
+      probe.textContent = el.textContent!.trim();
+      probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;letter-spacing:0;text-transform:uppercase;';
+      const cs = getComputedStyle(el);
+      probe.style.font = cs.font;
+      document.body.appendChild(probe);
+      const w = probe.getBoundingClientRect().width;
+      probe.remove();
+      return w;
+    };
+    const fit = () => {
+      const tagCount = tag.textContent!.trim().length;
+      const tagLs = parseFloat(getComputedStyle(tag).letterSpacing) || 0;
+      const target = natural(tag) + tagLs * (tagCount - 1); // visible width of the tagline
+      const n = brand.textContent!.trim().length;
+      const ls = Math.max(0, (target - natural(brand)) / (n - 1));
+      brand.style.setProperty('--ls', `${ls}px`);
+    };
+    document.fonts.ready.then(fit);
+    fit();
+    window.addEventListener('resize', fit, { passive: true });
+  }
+</script>
+
+<style>
+  .hero { position: relative; display: flex; color: #fff; overflow: hidden; }
+  .hero-full { min-height: 100svh; align-items: stretch; }
+  .hero-tall { min-height: 72svh; align-items: center; }
+  .hero-medium { min-height: 58svh; align-items: center; }
+  .hero :global(.hero-photo) { position: absolute; inset: 0; }
+  .hero :global(.hero-photo img) { animation: zoom 18s var(--ease) both; }
+  @keyframes zoom { from { transform: scale(1.08); } to { transform: scale(1); } }
+
+  /* Slideshow: photos crossfade, each slowly settling from a slight zoom while it's shown */
+  .slides { position: absolute; inset: 0; }
+  .hero :global(.slide) { opacity: 0; transition: opacity 1.8s var(--ease); }
+  .hero :global(.slide.on) { opacity: 1; }
+  .hero :global(.slide img) { animation: none; transform: scale(1.08); transition: transform 9s linear; }
+  .hero :global(.slide.on img) { transform: scale(1); }
+  .dots { position: absolute; z-index: 2; right: clamp(20px, 5vw, 96px); bottom: clamp(72px, 14vh, 150px); display: flex; gap: 10px; }
+  .dot { width: 34px; height: 18px; padding: 0; border: 0; background: none; cursor: pointer; position: relative; }
+  .dot::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: rgba(255, 255, 255, 0.4); transition: background 0.4s var(--ease); }
+  .dot:hover::before { background: rgba(255, 255, 255, 0.75); }
+  .dot.on::before { background: var(--saffron-soft); }
+  .dot:focus-visible { outline: 1px solid #fff; outline-offset: 3px; }
+  @media (max-width: 560px) { .dots { right: auto; left: clamp(20px, 5vw, 96px); bottom: 32px; } }
+  .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(16, 12, 8, 0.35) 0%, rgba(16, 12, 8, 0.2) 45%, rgba(16, 12, 8, 0.55) 100%); }
+  .hero-tall .shade, .hero-medium .shade { background: rgba(18, 14, 10, 0.48); }
+
+  /* Full hero — brand name + tagline only */
+  .hero-full .shade { background: radial-gradient(ellipse 60% 50% at 15% 85%, rgba(16, 12, 8, 0.42) 0%, rgba(16, 12, 8, 0.18) 100%), linear-gradient(180deg, rgba(16, 12, 8, 0.35), transparent 28%); }
+  .full-content { position: relative; width: 100%; display: grid; place-items: end start; padding: 120px clamp(20px, 5vw, 96px) clamp(72px, 14vh, 150px); text-align: left; }
+  .lockup { display: flex; flex-direction: column; align-items: flex-start; }
+  .lockup > * { opacity: 0; animation: fade 1.8s var(--ease) forwards; }
+  .lockup > :nth-child(2) { animation-delay: 0.4s; }
+  @keyframes fade { to { opacity: 1; } }
+
+  .brand-name {
+    --ls: 0.3em;
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(32px, 3.8vw, 54px);
+    line-height: 1;
+    letter-spacing: var(--ls);
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 2px 40px rgba(0, 0, 0, 0.2);
+  }
+  .tagline {
+    --ls: 0.5em;
+    margin: clamp(14px, 1.4vw, 20px) 0 0;
+    font-family: var(--sans);
+    font-size: clamp(13px, 1.35vw, 18px);
+    font-weight: 500;
+    letter-spacing: var(--ls);
+    text-transform: uppercase;
+    color: var(--saffron-soft);
+  }
+
+  /* Inner-page hero */
+  .content { position: relative; text-align: center; padding-top: 140px; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; }
+  .eyebrow { color: #fff; margin-bottom: 18px; opacity: 0.9; }
+  .content h1 { color: #fff; max-width: 18ch; }
+  .content h1 :global(em) { font-style: italic; }
+  .sub-c { margin-top: 22px; max-width: 46ch; font-size: 18px; color: rgba(255, 255, 255, 0.86); }
+  .center-actions { margin-top: 32px; justify-content: center; }
+  .crumbs { margin-top: 34px; display: flex; gap: 10px; font-size: 13px; text-transform: capitalize; color: rgba(255, 255, 255, 0.75); }
+  .crumbs a:hover { color: #fff; }
+
+  @media (max-width: 560px) {
+    .brand-name { --ls: 0.22em; }
+    .tagline { --ls: 0.32em; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lockup > * { animation: none; opacity: 1; }
+    .hero :global(.hero-photo img) { animation: none; }
+    .hero :global(.slide img) { transition: none; transform: none; }
+  }
+</style>

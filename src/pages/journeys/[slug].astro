@@ -1,0 +1,160 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import JourneyCard from '../../components/JourneyCard.astro';
+import EnquiryForm from '../../components/EnquiryForm.astro';
+import { journeys, accommodation } from '../../data/journeys.js';
+
+export function getStaticPaths() {
+  return journeys.map((j) => ({ params: { slug: j.slug }, props: { journey: j } }));
+}
+
+const { journey: j } = Astro.props;
+const idx = journeys.findIndex((x) => x.slug === j.slug);
+const related = [journeys[idx - 1], journeys[idx + 1]].filter(Boolean);
+---
+
+<Base title={`${j.title} — ${j.days} Days / ${j.nights} Nights`} description={`${j.title}: a ${j.days}-day private journey through ${j.route.join(', ')}. ${j.summary}`}>
+  <Hero photo={j.photo} alt={`${j.title} — ${j.route.join(', ')}`} tone={j.tone} eyebrow={`${j.days} days · ${j.nights} nights · Private journey`} title={j.title} sub={j.route.join(' · ')}>
+    <a href="#enquire" class="btn btn-saffron">Enquire about this journey <span class="arrow">→</span></a>
+  </Hero>
+
+  <div class="facts">
+    <div class="wrap facts-row">
+      <div><span>Duration</span><strong>{j.days} days / {j.nights} nights</strong></div>
+      <div><span>Route</span><strong>{j.route.join(' · ')}</strong></div>
+      <div><span>Style</span><strong>Private journey</strong></div>
+      <div><span>Accommodation</span><strong>Standard to Luxury</strong></div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="wrap layout">
+      <article>
+        <div class="reveal">
+          <span class="eyebrow">Overview</span>
+          <p class="lede" style="margin-top:20px">{j.intro}</p>
+          <p class="muted">{j.summary}</p>
+        </div>
+
+        <div class="block reveal">
+          <h2 class="h3">Highlights</h2>
+          <div class="chips">{j.highlights.map((h) => <span class="chip">{h}</span>)}</div>
+        </div>
+
+        <div class="block reveal">
+          <h2 class="h3">Overnight plan</h2>
+          <ol class="nights">
+            {j.overnight.map((o) => <li><span class="place">{o.place}</span><span class="dots"></span><span class="n">{o.nights} {o.nights === 1 ? 'night' : 'nights'}</span></li>)}
+          </ol>
+        </div>
+
+        <div class="block">
+          <h2 class="h3 reveal">Day by day</h2>
+          <ol class="days">
+            {j.itinerary.map((d, i) => (
+              <li class="day reveal">
+                <div class="day-no"><span>Day</span>{String(i + 1).padStart(2, '0')}</div>
+                <div class="day-body">
+                  <h3 class="h4">{d.title}</h3>
+                  <ul>{d.items.map((it) => <li>{it}</li>)}</ul>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div class="block reveal">
+          <h2 class="h3">Optional experiences & upgrades</h2>
+          <ul class="ticks" style="margin-top:20px">{j.optional.map((o) => <li>{o}</li>)}</ul>
+        </div>
+
+        <div class="block reveal">
+          <h2 class="h3">Accommodation, your way</h2>
+          <p class="muted" style="margin-top:16px">Every journey can be arranged at the level of comfort you prefer. Upgrading your accommodation does not change the core route.</p>
+          <div class="tiers">
+            {accommodation.map((a) => <div class="tier"><h4>{a.tier}</h4><p>{a.text}</p></div>)}
+          </div>
+        </div>
+
+        <p class="fine reveal">Itineraries are a starting point and may be adjusted for flight times, opening hours, festivals, weather and road conditions. Every element can be tailored to you.</p>
+      </article>
+
+      <aside class="side">
+        <div class="side-card">
+          <span class="eyebrow">{j.days} days · {j.nights} nights</span>
+          <h3 class="h3">{j.title}</h3>
+          <p class="muted">A private journey, flexible by design. Tell us your dates and we will shape it around you.</p>
+          <a href="#enquire" class="btn btn-solid">Enquire <span class="arrow">→</span></a>
+          <a href="/tailor-made/" class="link">Or make it tailor-made <span>→</span></a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section bg-2" id="enquire-section">
+    <div class="wrap split top">
+      <div class="reveal">
+        <span class="eyebrow">Enquire</span>
+        <h2 class="h2" style="margin:22px 0 26px">Make {j.title} <em>your own.</em></h2>
+        <p class="lede">Extend your stay, change the pace or upgrade your accommodation. We will reply personally with ideas and a tailored proposal.</p>
+      </div>
+      <div class="reveal"><EnquiryForm journey={j.title} /></div>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <section class="section">
+      <div class="wrap">
+        <div class="head reveal"><span class="eyebrow">Other journeys</span><h2 class="h2" style="margin-top:22px">Continue exploring.</h2></div>
+        <div class="grid grid-2">{related.map((r) => <div class="reveal"><JourneyCard journey={r} large /></div>)}</div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .facts { border-bottom: 1px solid var(--line); background: var(--paper); }
+  .facts-row { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .facts-row div { padding: 28px 20px 28px 0; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+  .facts-row div + div { padding-left: 24px; }
+  .facts-row div:last-child { border-right: 0; }
+  .facts span { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); }
+  .facts strong { font-family: var(--serif); font-weight: 400; font-size: 21px; }
+  @media (max-width: 860px) {
+    .facts-row { grid-template-columns: 1fr 1fr; }
+    .facts-row div { border-right: 0; border-bottom: 1px solid var(--line); padding-left: 0 !important; }
+  }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: clamp(48px, 7vw, 110px); align-items: start; }
+  .side { position: sticky; top: 110px; }
+  .side-card { border: 1px solid var(--line); padding: 34px; display: flex; flex-direction: column; gap: 18px; align-items: flex-start; background: var(--paper); }
+  @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } .side { position: static; } }
+
+  .block { margin-top: clamp(56px, 6vw, 84px); }
+  .block > h2 { margin-bottom: 24px; }
+
+  .nights { list-style: none; padding: 0; margin: 0; max-width: 520px; }
+  .nights li { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; }
+  .nights .place { font-family: var(--serif); font-size: 26px; }
+  .nights .dots { flex: 1; border-bottom: 1px dotted rgba(27, 32, 30, 0.3); transform: translateY(-6px); }
+  .nights .n { font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--saffron); }
+
+  .days { list-style: none; padding: 0; margin: 0; border-left: 1px solid var(--line); }
+  .day { display: grid; grid-template-columns: 90px 1fr; gap: 20px; padding: 0 0 44px; position: relative; }
+  .day::before { content: ''; position: absolute; left: -5px; top: 10px; width: 9px; height: 9px; border-radius: 50%; background: var(--paper); border: 1px solid var(--saffron); }
+  .day-no { padding-left: 26px; font-family: var(--serif); font-size: 40px; line-height: 1; color: var(--saffron); }
+  .day-no span { display: block; font-family: var(--sans); font-size: 10.5px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 6px; }
+  .day-body h3 { margin-bottom: 14px; }
+  .day-body li { color: var(--ink-soft); padding: 4px 0 4px 20px; position: relative; font-size: 16px; }
+  .day-body li::before { content: '—'; position: absolute; left: 0; color: var(--saffron); }
+  @media (max-width: 560px) { .day { grid-template-columns: 1fr; gap: 10px; } .day-body { padding-left: 26px; } }
+
+  .tiers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 28px; }
+  .tier { background: var(--paper); padding: 26px; }
+  .tier h4 { font-size: 24px; margin-bottom: 8px; }
+  .tier p { font-size: 15px; color: var(--ink-soft); }
+  @media (max-width: 560px) { .tiers { grid-template-columns: 1fr; } }
+
+  .fine { margin-top: 56px; font-size: 14px; color: var(--ink-mute); font-style: italic; }
+</style>

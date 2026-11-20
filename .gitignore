@@ -1,0 +1,10 @@
+﻿node_modules/
+dist/
+.astro/
+.wrangler/
+.dev.vars
+
+# Local safety copies made while editing
+backups/
+# Client content documents (working files, not part of the site)
+*.docx
