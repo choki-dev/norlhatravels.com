@@ -1,7 +1,9 @@
 ---
 import Logo from './Logo.astro';
 import { nav } from '../data/site.js';
-const path = Astro.url.pathname;
+// Path without the GitHub Pages base (/norlhatravels.com), so menu highlighting works there too
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = Astro.url.pathname.slice(base.length) || '/';
 const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
 const items = [{ label: 'Home', href: '/' }, ...nav];
 const mobileItems = [...items, { label: 'Tailor-Made Journeys', href: '/tailor-made/' }];

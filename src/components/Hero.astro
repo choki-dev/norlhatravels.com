@@ -17,7 +17,8 @@ interface Props {
 }
 const { photo, alt, tone, eyebrow, title, tagline, sub, size = 'tall', slides } = Astro.props;
 const show = slides && slides.length > 1 ? slides : null;
-const crumb = Astro.url.pathname.split('/').filter(Boolean);
+// Breadcrumb from the path, without the GitHub Pages base (/norlhatravels.com)
+const crumb = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, '').length).split('/').filter(Boolean);
 ---
 
 <section class:list={['hero', `hero-${size}`, 'on-dark']}>
