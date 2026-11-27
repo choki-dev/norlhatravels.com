@@ -4,8 +4,9 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site.js';
 
-interface Props { title?: string; description?: string }
-const { title, description = `${site.legalName} — private, tailor-made journeys across Bhutan. ${site.supporting}` } = Astro.props;
+// lightTop: the page opens on an ivory background, so the header starts with dark text
+interface Props { title?: string; description?: string; lightTop?: boolean }
+const { title, lightTop = false, description = `${site.legalName} — private, tailor-made journeys across Bhutan. ${site.supporting}` } = Astro.props;
 const fullTitle = title ? `${title} · NorLha — Bhutan, Your Way` : 'NorLha — Bhutan, Your Way · Private Journeys in Bhutan';
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -30,7 +31,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script is:inline>document.documentElement.classList.remove('no-js');</script>
   </head>
-  <body>
+  <body class:list={{ "light-top": lightTop }}>
     <a class="skip" href="#main">Skip to content</a>
     <Header />
     <main id="main"><slot /></main>

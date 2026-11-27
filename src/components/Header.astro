@@ -155,3 +155,11 @@ const mobileItems = [...items, { label: 'Tailor-Made Journeys', href: '/tailor-m
     .brand :global(img) { width: 56px; height: 56px; }
   }
 </style>
+
+<style is:global>
+  /* Pages that open on ivory (split / framed heroes): dark header text until the bar turns solid */
+  .light-top .site-header:not(.solid):not(.open) { color: var(--ink); }
+  .light-top .site-header:not(.solid):not(.open)::before { opacity: 0; }
+  .light-top .site-header:not(.solid):not(.open) .cta { border-color: rgba(29, 26, 22, 0.4); }
+  .light-top .site-header:not(.solid):not(.open) .cta:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+</style>

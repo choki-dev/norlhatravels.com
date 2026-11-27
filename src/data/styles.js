@@ -1,6 +1,7 @@
 // "Explore Bhutan Your Way" travel styles. Source: Content & Concept doc, Page 4 + "Details" pages.
-// Romance and Cultural have full detail copy in the docs. The other four only have a summary so far;
-// their pages use that summary until the full copy is supplied (see `pendingCopy`).
+// Romance and Cultural have their own detail copy in the docs. Luxury, Himalayan Adventures, Family
+// and Wellness are assembled from lines elsewhere in the documents (Pages 1–3 and the optional
+// experiences in the Itinerary doc) — replace them when dedicated copy is written.
 
 export const styles = [
   {
@@ -12,17 +13,42 @@ export const styles = [
     short: 'Comfort, privacy and exceptional experiences, thoughtfully combined.',
     summary:
       'Comfort, privacy and exceptional experiences thoughtfully combined around your preferences, with carefully selected accommodation and personalised arrangements.',
+    eyebrow: 'Private · Tailor-made · Thoughtfully refined',
     headline: 'Luxury is personal.',
+    lead: [
+      'Luxury is personal.',
+      'For some, it is an exceptional hotel surrounded by mountains. For others, it is a private experience, a beautiful meal, or simply having time with nowhere else to be.',
+      'We focus on the details that make a journey feel comfortable, effortless and special.',
+    ],
     sections: [
       {
         heading: 'Comfort without compromising character',
         paras: [
-          'For some, luxury is an exceptional hotel surrounded by mountains. For others, it is a private experience, a beautiful meal, or simply having time with nowhere else to be.',
-          'From intimate boutique properties to distinguished luxury hotels and retreats, we arrange accommodation according to your preferences, itinerary and availability — and the same care applies to transportation and guiding.',
+          'From intimate boutique properties to distinguished luxury hotels and retreats, we can arrange accommodation according to your preferences, itinerary and availability. The same applies to transportation and guiding.',
+          'Your journey should have the right balance of comfort, privacy, authenticity and flexibility.',
+        ],
+      },
+      {
+        heading: 'Thoughtfully selected',
+        paras: ['Where you stay and how you travel are part of the experience. Depending on your preferences, your journey can include:'],
+        list: [
+          '5-star hotels, luxury resorts and exclusive retreats, subject to availability',
+          'A personally selected mix of properties and room categories',
+          'Premium or luxury lodge stays, such as in the Phobjikha Valley',
+          'Private transportation and personal guiding',
+          'Spa, wellness treatments and a traditional hot stone bath',
+          'Private farmhouse dinners and special arrangements',
+        ],
+      },
+      {
+        heading: 'Seamlessly arranged',
+        paras: [
+          'The best journeys feel effortless.',
+          'We coordinate the details behind the scenes — from arrival and transportation to accommodation, guides, experiences, and the practical elements of your journey — so you can concentrate on being present.',
         ],
       },
     ],
-    pendingCopy: true,
+    cta: 'Plan your luxury journey',
   },
   {
     slug: 'cultural-bhutan',
@@ -82,9 +108,35 @@ export const styles = [
     short: 'Experience Bhutan’s mountains, forests, valleys and trails.',
     summary:
       'Experience Bhutan’s mountains, forests, valleys and trails through scenic walks, trekking and outdoor adventures.',
+    eyebrow: 'Private · Active · Personally curated',
     headline: 'Mountains, forests, valleys and trails.',
-    sections: [],
-    pendingCopy: true,
+    lead: [
+      'Experience Bhutan’s mountains, forests, valleys and trails.',
+      'Through scenic walks, trekking and outdoor adventures, discover a Kingdom shaped by the Himalayas — at a pace that feels right for you.',
+    ],
+    sections: [
+      {
+        heading: 'Out on the trail',
+        paras: ['Depending on your interests, fitness and the season, your journey can include:'],
+        list: [
+          'The hike to Taktsang — Tiger’s Nest Monastery (approx. 5–6 hours round trip)',
+          'Himalayan trekking',
+          'A walk on the Gangtey Nature Trail in the Phobjikha Valley',
+          'The walk to Khamsum Yulley Namgyal Chorten above Punakha',
+          'Mountain views from Dochula Pass, when weather permits',
+          'White-water rafting in Punakha, subject to season and river conditions',
+          'Gentle village walks and forest paths',
+        ],
+      },
+      {
+        heading: 'The journey itself',
+        paras: [
+          'A mountain road disappearing into the clouds. The first view of the Himalayas. The quiet after reaching a sacred place.',
+          'Add a trek. Spend longer in a valley. We plan the pace, the trails and the rest days around you.',
+        ],
+      },
+    ],
+    cta: 'Plan your adventure',
   },
   {
     slug: 'romance-and-honeymoons',
@@ -145,9 +197,35 @@ export const styles = [
     short: 'Meaningful experiences designed for every generation.',
     summary:
       'Introduce every generation to Bhutan through culture, nature, adventure and genuine local experiences, with a pace suited to the whole family.',
+    eyebrow: 'Private · Meaningful · Every generation',
     headline: 'Bhutan for every generation.',
-    sections: [],
-    pendingCopy: true,
+    lead: [
+      'Meaningful experiences designed for every generation.',
+      'Introduce every generation to Bhutan through culture, nature, adventure and genuine local experiences, with a pace suited to the whole family.',
+    ],
+    sections: [
+      {
+        heading: 'Experiences to share',
+        paras: ['Depending on your family’s interests, your journey can include:'],
+        list: [
+          'A private farmhouse meal or a traditional cooking experience',
+          'Archery, Bhutan’s national sport',
+          'A local craft workshop or a visit to the Institute for Zorig Chusum',
+          'The Takin Preserve in Thimphu',
+          'Gentle village walks and time with local families',
+          'White-water rafting in Punakha, subject to season and river conditions',
+          'Festivals, when your journey coincides with one',
+        ],
+      },
+      {
+        heading: 'A pace that suits everyone',
+        paras: [
+          'Private transportation, personal guiding and flexible itineraries give your family the freedom to experience Bhutan without being tied to someone else’s schedule.',
+          'Pause when you want. Stay longer when something captures your imagination. Change the rhythm of your day.',
+        ],
+      },
+    ],
+    cta: 'Plan your family journey',
   },
   {
     slug: 'wellness-and-stillness',
@@ -158,8 +236,33 @@ export const styles = [
     short: 'A slower journey shaped around nature, reflection and renewal.',
     summary:
       'A slower journey shaped around nature, reflection, spirituality, traditional wellness and renewal.',
+    eyebrow: 'Private · Restorative · Slow travel',
     headline: 'Nature, reflection and renewal.',
-    sections: [],
-    pendingCopy: true,
+    lead: [
+      'Bhutan rewards those who take their time.',
+      'A slower journey shaped around nature, reflection, spirituality, traditional wellness and renewal.',
+    ],
+    sections: [
+      {
+        heading: 'Time to slow down',
+        paras: ['Depending on your interests, your journey can include:'],
+        list: [
+          'A traditional hot stone bath',
+          'Spa and wellness treatments',
+          'Meditation and spiritual traditions',
+          'Quiet walks on the Gangtey Nature Trail',
+          'Visits to sacred sites, monasteries and temples',
+          'Unhurried days in the peaceful valleys of Punakha and Phobjikha',
+        ],
+      },
+      {
+        heading: 'Stillness',
+        paras: [
+          'A quiet morning in the mountains. The sound of a temple bell. The changing light across a Himalayan valley.',
+          'Or simply time away from everything.',
+        ],
+      },
+    ],
+    cta: 'Plan your wellness journey',
   },
 ];

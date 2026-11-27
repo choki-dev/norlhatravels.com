@@ -1,29 +1,65 @@
 ---
+// Explore Bhutan Your Way — copy: Content & Concept doc, Pages 1 and 4.
+// Title banner → your Bhutan, personally curated (photo collage) → the six travel styles as a
+// staggered gallery → tailor-made Bhutan (statement) → closing band.
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
-import StyleCard from '../../components/StyleCard.astro';
+import Photo from '../../components/Photo.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import { styles } from '../../data/styles.js';
 ---
 
 <Base title="Explore Bhutan Your Way" description="Luxury, cultural, adventure, romance, family and wellness journeys in Bhutan — travel styles shaped around you, not fixed packages.">
-  <Hero photo="explore-hero" alt="A Bhutanese valley at golden hour" tone="dusk" eyebrow="Explore Bhutan your way" title="Shaped around <em>how you travel.</em>" sub="Beyond our signature journeys, discover Bhutan through experiences shaped around your interests, travel style and preferences." />
+  <Hero photo="explore-hero" alt="A Bhutanese landscape" tone="valley" eyebrow="Explore Bhutan your way" title="Your Bhutan, <em>personally curated.</em>" />
 
+  <!-- Introduction -->
   <section class="section">
-    <div class="wrap">
-      <div class="grid grid-3">
-        {styles.map((s, i) => <div class="reveal" style={`transition-delay:${(i % 3) * 90}ms`}><StyleCard style={s} /></div>)}
+    <div class="wrap duo">
+      <div class="duo-media reveal">
+        <Photo name="culture" alt="Bhutanese culture and tradition" tone="dzong" sizes="(max-width: 860px) 75vw, 34vw" />
+        <Photo name="wellness" alt="A quiet moment in nature" tone="forest" sizes="(max-width: 860px) 60vw, 26vw" />
+      </div>
+      <div class="duo-text reveal">
+        <span class="kicker">Travel styles, not packages</span>
+        <h2 class="big">Discover Bhutan through experiences shaped around you.</h2>
+        <p>Whether you are looking for a private cultural journey, a romantic escape, a family adventure, a Himalayan trek, a wellness retreat, or a completely tailor-made experience, we will shape your journey around you.</p>
+        <ul class="checks cols">{styles.map((s) => <li>{s.title}</li>)}</ul>
+        <a href="#styles" class="btn btn-solid">Find your way <span class="arrow">↓</span></a>
       </div>
     </div>
   </section>
 
-  <section class="section-tight bg-2">
-    <div class="wrap-narrow center reveal">
-      <span class="eyebrow">Tailor-Made Bhutan</span>
-      <h2 class="h2" style="margin:22px 0 24px">No template. No fixed formula. <em>Simply your journey.</em></h2>
-      <a href="/tailor-made/" class="link">How tailor-made works <span>→</span></a>
+  <!-- The styles -->
+  <section class="section bg-2" id="styles">
+    <div class="wrap stagger">
+      {styles.map((s) => (
+        <a href={`/explore/${s.slug}/`} class="st-item reveal">
+          <Photo name={s.photo} alt={s.title} tone={s.tone} sizes="(max-width: 760px) 100vw, 48vw" />
+          <div class="st-body">
+            <span class="kicker">{s.tags}</span>
+            <h3>{s.title}</h3>
+            <p>{s.summary}</p>
+            <span class="link">Discover {s.title}</span>
+          </div>
+        </a>
+      ))}
     </div>
   </section>
 
-  <CtaBand title="Tell us what inspires you." photo="explore-cta" tone="valley" button="Start planning" />
+  <!-- Tailor-made -->
+  <section class="stmt">
+    <div class="wrap reveal">
+      <span class="kicker">Tailor-made Bhutan</span>
+      <h2>No template. No fixed formula. <em>Simply your journey.</em></h2>
+      <div class="lines"><p>Don’t choose a package. Create a journey.</p></div>
+      <a href="/tailor-made/" class="btn btn-outline">How tailor-made works <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <CtaBand photo="explore-cta" tone="dusk" eyebrow="Begin your journey" title="Bhutan is waiting." text="Tell us what you are looking for, and let us create a journey around it." />
 </Base>
+
+<style>
+  a.st-item:hover h3 { color: var(--saffron); }
+  .st-body h3 { transition: color 0.3s var(--ease); }
+</style>

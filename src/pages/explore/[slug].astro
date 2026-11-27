@@ -1,8 +1,9 @@
 ---
+// One travel style — photo hero → the lead as a centred introduction → chapters
+// (heading beside text) on ivory → enquiry → the other styles.
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
 import Photo from '../../components/Photo.astro';
-import StyleCard from '../../components/StyleCard.astro';
 import EnquiryForm from '../../components/EnquiryForm.astro';
 import { styles } from '../../data/styles.js';
 
@@ -11,66 +12,108 @@ export function getStaticPaths() {
 }
 
 const { style: s } = Astro.props;
-const others = styles.filter((x) => x.slug !== s.slug).slice(0, 3);
+const others = styles.filter((x) => x.slug !== s.slug);
+const lead: string[] = s.lead ?? [s.summary];
 ---
 
 <Base title={s.title} description={s.summary}>
-  <Hero photo={s.photo} alt={s.title} tone={s.tone} eyebrow={s.eyebrow ?? s.tags} title={s.headline} sub={s.title}>
-    <a href="#enquire" class="btn btn-saffron">{s.cta ?? 'Plan your journey'} <span class="arrow">→</span></a>
-  </Hero>
+  <Hero photo={s.photo} alt={s.title} tone={s.tone} eyebrow={s.title} title={s.headline} sub={s.short} />
 
   <section class="section">
-    <div class="wrap split">
-      <div class="reveal">
-        <span class="eyebrow">{s.title}</span>
-        {s.lead ? (
-          <div class="verse lead">{s.lead.map((p: string) => <p>{p}</p>)}</div>
-        ) : (
-          <p class="verse lead">{s.summary}</p>
-        )}
+    <div class="wrap duo">
+      <div class="duo-media reveal">
+        <Photo name={s.photo} alt={s.title} tone={s.tone} sizes="(max-width: 860px) 75vw, 34vw" />
+        <Photo name={`${s.photo}-2`} alt={`${s.title} in Bhutan`} tone={s.tone} sizes="(max-width: 860px) 60vw, 26vw" />
       </div>
-      <Photo name={`${s.photo}-2`} alt={s.title} tone={s.tone} class="side-photo reveal" sizes="(max-width: 860px) 100vw, 50vw" />
+      <div class="duo-text reveal">
+        <span class="kicker">{s.eyebrow ?? s.tags}</span>
+        <h2 class="big">{lead[0]}</h2>
+        {lead.slice(1).map((p) => <p>{p}</p>)}
+        <a href="#enquire" class="btn btn-solid">{s.cta ?? 'Plan your journey'} <span class="arrow">→</span></a>
+      </div>
     </div>
   </section>
 
-  {s.sections.map((sec: any, i: number) => (
-    <section class:list={['section', { 'bg-2': i % 2 === 0 }]}>
-      <div class="wrap split top">
-        <div class="reveal">
-          <span class="eyebrow">0{i + 1}</span>
-          <h2 class="h2" style="margin-top:18px">{sec.heading}</h2>
-        </div>
-        <div class="reveal">
-          {sec.paras.map((p: string, k: number) => <p class:list={[k === 0 ? 'lede' : 'muted']}>{p}</p>)}
-          {sec.list && <ul class="ticks" style="margin-top:20px">{sec.list.map((li: string) => <li>{li}</li>)}</ul>}
-          {sec.after && <p class="after">{sec.after}</p>}
-        </div>
-      </div>
-    </section>
-  ))}
+  <!-- Chapters -->
+  <section class="chapters bg-tint">
+    <div class="wrap">
+      {s.sections.map((sec: any, i: number) => (
+        <article class="ch">
+          <header class="ch-head reveal">
+            <span class="ch-no">{String(i + 1).padStart(2, '0')} / {String(s.sections.length).padStart(2, '0')}</span>
+            <h2 class="big">{sec.heading}</h2>
+          </header>
+          <div class="ch-body reveal">
+            {sec.paras.map((p: string, k: number) => <p class:list={{ 'ch-first': k === 0 }}>{p}</p>)}
+            {sec.list && <ul class="ch-list">{sec.list.map((li: string) => <li>{li}</li>)}</ul>}
+            {sec.after && <p class="ch-after">{sec.after}</p>}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
 
-  <section class="section bg-pine" id="plan">
-    <div class="wrap split top">
+  <!-- Statement -->
+  <section class="stmt">
+    <div class="wrap reveal">
+      <span class="kicker">{s.title}</span>
+      <h2>{s.short}</h2>
+      <a href="#enquire" class="btn btn-outline">{s.cta ?? 'Plan your journey'} <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <!-- Enquire -->
+  <section class="section bg-2" id="plan">
+    <div class="wrap enq">
       <div class="reveal">
-        <span class="eyebrow">{s.closing?.heading ?? 'Made for you'}</span>
-        <h2 class="h2" style="margin:22px 0 26px">{s.closing?.text ?? 'Every journey is shaped around your preferences, pace and the experiences that matter to you.'}</h2>
+        <span class="kicker">{s.closing?.heading ?? 'Made for you'}</span>
+        <h2 class="h2" style="margin:14px 0 22px">{s.closing?.text ?? 'Every journey is shaped around your preferences, pace and the experiences that matter to you.'}</h2>
         <p class="lede">Share a few details and we will reply personally with ideas for your {s.title.toLowerCase()} journey.</p>
       </div>
-      <div class="reveal form-card"><EnquiryForm style={s.title} /></div>
+      <div class="panel reveal"><EnquiryForm style={s.title} /></div>
     </div>
   </section>
 
-  <section class="section">
+  <!-- Other styles: a strip of round photos -->
+  <section class="others">
     <div class="wrap">
-      <div class="head reveal"><span class="eyebrow">More ways to travel</span><h2 class="h2" style="margin-top:22px">Explore Bhutan your way.</h2></div>
-      <div class="grid grid-3">{others.map((o) => <div class="reveal"><StyleCard style={o} short /></div>)}</div>
+      <span class="eyebrow">More ways to travel</span>
+      <ul class="o-row">
+        {others.map((o) => (
+          <li>
+            <a href={`/explore/${o.slug}/`}>
+              <span class="o-circle"><Photo name={o.photo} alt="" tone={o.tone} sizes="160px" /></span>
+              <span class="o-t">{o.title}</span>
+              <span class="o-tags">{o.tags}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 </Base>
 
 <style>
-  .lead { margin-top: 24px; }
-  :global(.side-photo) { aspect-ratio: 4 / 5; }
-  .after { font-family: var(--serif); font-style: italic; font-size: 26px; color: var(--maroon); margin-top: 28px; }
-  .form-card { background: var(--paper); color: var(--ink); padding: clamp(28px, 4vw, 52px); }
+  /* Chapters: heading beside text */
+  .chapters { padding: clamp(60px, 7vw, 100px) 0; }
+  .ch { display: grid; grid-template-columns: 1fr 1.25fr; gap: clamp(40px, 7vw, 110px); align-items: start; padding: clamp(48px, 6vw, 80px) 0; border-top: 1px solid var(--line); }
+  .ch:first-child { border-top: 0; }
+  .ch-head { position: static; }
+  .ch-no { display: block; margin-bottom: 16px; font-family: var(--label); font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--saffron); }
+  .ch-first { color: var(--heading); }
+  .ch-list { margin-top: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+  .ch-list li { position: relative; padding: 13px 0 13px 28px; border-bottom: 1px solid var(--line); font-size: 15.5px; line-height: 1.5; }
+  .ch-list li::before { content: ''; position: absolute; left: 0; top: 19px; width: 12px; height: 7px; border-left: 1.5px solid var(--saffron); border-bottom: 1.5px solid var(--saffron); transform: rotate(-45deg); }
+  .ch-after { margin-top: 26px; font-family: var(--serif); font-style: italic; font-size: clamp(20px, 1.8vw, 24px); line-height: 1.4; color: var(--heading); }
+  @media (max-width: 860px) { .ch { grid-template-columns: 1fr; gap: 20px; } .ch-head { position: static; } .ch-list { grid-template-columns: 1fr; } }
+
+  /* Other styles */
+  .others { padding: clamp(70px, 8vw, 110px) 0; text-align: center; }
+  .o-row { display: flex; justify-content: center; flex-wrap: wrap; gap: clamp(24px, 4vw, 56px); margin-top: 36px; }
+  .o-row a { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 150px; }
+  .o-circle { position: relative; width: 120px; aspect-ratio: 1; border-radius: 50%; overflow: hidden; margin-bottom: 12px; box-shadow: 0 0 0 0 var(--saffron); transition: box-shadow 0.4s var(--ease), transform 0.5s var(--ease); }
+  .o-circle :global(.photo) { position: absolute; inset: 0; }
+  .o-row a:hover .o-circle { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--saffron); transform: translateY(-4px); }
+  .o-t { font-family: var(--serif); font-size: 22px; line-height: 1.15; color: var(--heading); }
+  .o-tags { font-family: var(--label); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); }
 </style>

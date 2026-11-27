@@ -1,0 +1,90 @@
+---
+// Inner-page heroes that open on ivory (use with <Base lightTop>):
+//  - split: a full-height photo on one side, the title on ivory on the other
+//  - frame: a large title on ivory, then a wide photo set inside the page margins
+import Photo from './Photo.astro';
+interface Props {
+  variant: 'split' | 'frame';
+  photo: string;
+  alt: string;
+  tone?: any;
+  eyebrow?: string;
+  title: string;
+  sub?: string;
+  /** split only: photo on the right instead of the left */
+  flip?: boolean;
+}
+const { variant, photo, alt, tone, eyebrow, title, sub, flip = false } = Astro.props;
+const crumb = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, '').length).split('/').filter(Boolean);
+---
+
+<section class:list={['lh', `lh-${variant}`, { flip }]}>
+  {variant === 'split' && <Photo name={photo} alt={alt} tone={tone} class="lh-photo" eager sizes="(max-width: 860px) 100vw, 55vw" />}
+  <div class="lh-text">
+    {crumb.length > 0 && (
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        {crumb.map((c) => <><span aria-hidden="true">/</span><span>{c.replace(/-/g, ' ')}</span></>)}
+      </nav>
+    )}
+    {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+    <h1 set:html={title} />
+    {sub && <p class="sub">{sub}</p>}
+    {Astro.slots.has('default') && <div class="actions"><slot /></div>}
+  </div>
+  {variant === 'frame' && <Photo name={photo} alt={alt} tone={tone} class="lh-photo" eager sizes="100vw" />}
+</section>
+
+<style>
+  .lh { background: var(--paper-2); position: relative; }
+  .lh-text > * { opacity: 0; animation: rise 1.4s var(--ease) forwards; }
+  .lh-text > :nth-child(2) { animation-delay: 0.12s; }
+  .lh-text > :nth-child(3) { animation-delay: 0.24s; }
+  .lh-text > :nth-child(4) { animation-delay: 0.36s; }
+  .lh-text > :nth-child(5) { animation-delay: 0.48s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .lh :global(.lh-photo img) { animation: settle 14s var(--ease) both; }
+  @keyframes settle { from { transform: scale(1.07); } to { transform: scale(1); } }
+
+  .crumbs { display: flex; gap: 10px; margin-bottom: 30px; font-family: var(--label); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); }
+  .crumbs a:hover { color: var(--saffron); }
+  .crumbs span:last-child { color: var(--ink); }
+  .eyebrow { color: var(--saffron); letter-spacing: 0.22em; font-size: 12.5px; margin-bottom: 20px; display: block; }
+  h1 { font-size: clamp(42px, 5.2vw, 80px); line-height: 1.04; }
+  h1 :global(em) { color: var(--saffron); }
+  .sub { margin: 26px 0 0; max-width: 44ch; font-size: 17.5px; line-height: 1.65; }
+  .actions { margin-top: 34px; display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* Split */
+  .lh-split { display: grid; grid-template-columns: 55fr 45fr; min-height: 100svh; }
+  .lh-split :global(.lh-photo) { position: relative; min-height: 100%; }
+  .lh-split .lh-text { display: flex; flex-direction: column; justify-content: flex-end; padding: 140px clamp(28px, 5vw, 96px) clamp(56px, 9vh, 110px); }
+  .lh-split.flip :global(.lh-photo) { order: 2; }
+  .lh-split h1 { max-width: 12ch; }
+
+  /* Frame */
+  .lh-frame { padding: 160px clamp(20px, 5vw, 96px) 0; }
+  .lh-frame .lh-text { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; column-gap: 60px; align-items: end; }
+  .lh-frame .crumbs, .lh-frame .eyebrow { grid-column: 1 / -1; }
+  .lh-frame h1 { font-size: clamp(48px, 7.4vw, 118px); max-width: 14ch; }
+  .lh-frame .sub { margin: 0 0 14px; max-width: 34ch; }
+  .lh-frame :global(.lh-photo) { max-width: 1240px; margin: clamp(40px, 5vw, 64px) auto 0; aspect-ratio: 21 / 9; }
+  /* the ivory runs only halfway down the photo, so it sits across the edge of the section below */
+  .lh-frame::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: calc(min(100vw - 2 * clamp(20px, 5vw, 96px), 1240px) * 9 / 21 / 2); background: var(--paper); z-index: 0; }
+  .lh-frame > * { position: relative; z-index: 1; }
+
+  @media (max-width: 860px) {
+    .lh-split { grid-template-columns: 1fr; min-height: 0; }
+    .lh-split :global(.lh-photo) { aspect-ratio: 4 / 3.4; min-height: 0; order: 2; }
+    .lh-split .lh-text { padding-top: 120px; padding-bottom: 48px; }
+    .lh-frame { padding-top: 120px; }
+    .lh-frame .lh-text { grid-template-columns: 1fr; }
+    .lh-frame .sub { margin-top: 22px; }
+    .lh-frame :global(.lh-photo) { aspect-ratio: 4 / 3; }
+    .lh-frame::after { height: calc((100vw - 40px) * 3 / 4 / 2); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lh-text > * { animation: none; opacity: 1; }
+    .lh :global(.lh-photo img) { animation: none; }
+  }
+</style>

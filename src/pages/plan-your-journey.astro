@@ -1,0 +1,554 @@
+---
+// Plan your journey — a step-by-step journey builder, reached from "Customize your journey".
+// Each step is a choice on its own screen; the answers post to the same /api/enquiry endpoint as
+// the enquiry form. Without JavaScript all steps show as one long form and still submit.
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import Icon from '../components/Icon.astro';
+import { styles } from '../data/styles.js';
+import { destinations } from '../data/destinations.js';
+import { accommodation } from '../data/journeys.js';
+
+const interests = [
+  { icon: 'temple', t: 'Culture and heritage' },
+  { icon: 'mountain', t: 'Himalayan trekking' },
+  { icon: 'lotus', t: 'Wellness and spirituality' },
+  { icon: 'camera', t: 'Photography' },
+  { icon: 'bowl', t: 'Food and local cuisine' },
+  { icon: 'flags', t: 'Festivals' },
+  { icon: 'leaf', t: 'Wildlife and nature' },
+  { icon: 'people', t: 'Family experiences' },
+  { icon: 'heart', t: 'Romance and honeymoons' },
+  { icon: 'glass', t: 'Private celebrations' },
+  { icon: 'moon', t: 'Time away from everything' },
+  { icon: 'house', t: 'Village life and homestays' },
+];
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const thisYear = new Date().getFullYear();
+const years = [thisYear, thisYear + 1, thisYear + 2];
+const durations = ['3–4 days', '5–7 days', '8–10 days', '11–14 days', 'More than two weeks', 'Not sure yet'];
+const paces = [
+  { t: 'Relaxed', p: 'Fewer moves, long breakfasts, time to simply be.' },
+  { t: 'Balanced', p: 'A thoughtful mix of discovery and downtime.' },
+  { t: 'Active', p: 'Full days, hikes and as much of Bhutan as possible.' },
+];
+const occasions = ['Just because', 'Honeymoon', 'Anniversary', 'Birthday', 'Family celebration', 'Retirement'];
+const tierIcon: Record<string, string> = { Standard: 'bed', Premium: 'star', Luxury: 'diamond', Bespoke: 'sliders' };
+
+const steps = ['Style', 'Places', 'Interests', 'Timing', 'Travelers', 'Details', 'Review'];
+---
+
+<Base title="Plan Your Journey" lightTop description="Build your private Bhutan journey step by step — travel style, places, interests, timing and stay — and we will reply personally with a first outline.">
+  <section class="pj">
+    <div class="wrap pj-wrap">
+      <header class="pj-head">
+        <span class="kicker">Plan your journey</span>
+        <h1 class="pj-title">Bhutan, <em>your way.</em></h1>
+        <p class="pj-lede">A few simple choices — skip anything you are unsure of. We will reply personally with ideas and a first outline.</p>
+      </header>
+
+      <ol class="pj-progress" aria-label="Steps" data-progress>
+        {steps.map((s, i) => (
+          <li data-dot={i}><button type="button" data-goto={i} disabled={i > 0}><span class="pj-num">{String(i + 1).padStart(2, '0')}</span><span class="pj-lbl">{s}</span></button></li>
+        ))}
+      </ol>
+      <div class="pj-bar" aria-hidden="true"><span data-bar></span></div>
+
+      <form class="pj-form" action="/api/enquiry" method="post" data-wizard novalidate>
+        <input type="hidden" name="journey" value="Tailor-made (journey builder)" />
+
+        <!-- 1. Travel style -->
+        <fieldset class="pj-step" data-step="0">
+          <legend><span class="pj-q">How would you like to experience Bhutan?</span><span class="pj-hint">Choose the style that feels closest — you can mix and match later.</span></legend>
+          <div class="cards cards-3">
+            {styles.map((s) => (
+              <label class="card">
+                <input type="radio" name="style" value={s.title} />
+                <Photo name={s.photo} alt="" tone={s.tone as any} class="card-photo" sizes="(max-width: 640px) 90vw, 30vw" />
+                <span class="card-body"><b>{s.title}</b><small>{s.short}</small></span>
+                <span class="tick" aria-hidden="true"></span>
+              </label>
+            ))}
+            <label class="card card-plain">
+              <input type="radio" name="style" value="Open to ideas" />
+              <span class="card-body"><Icon name="compass" size={44} /><b>Open to ideas</b><small>Not sure yet — surprise me with suggestions.</small></span>
+              <span class="tick" aria-hidden="true"></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- 2. Places -->
+        <fieldset class="pj-step" data-step="1">
+          <legend><span class="pj-q">Where would you like to go?</span><span class="pj-hint">Select as many places as you like.</span></legend>
+          <div class="cards cards-4">
+            {destinations.map((d) => (
+              <label class="card card-sm">
+                <input type="checkbox" name="destinations" value={d.name} />
+                <Photo name={d.photo} alt="" tone={d.tone as any} class="card-photo" sizes="(max-width: 640px) 45vw, 22vw" />
+                <span class="card-body"><b>{d.name}</b><small>{d.kicker}</small></span>
+                <span class="tick" aria-hidden="true"></span>
+              </label>
+            ))}
+            <label class="card card-plain card-sm">
+              <input type="checkbox" name="destinations" value="Help me choose" data-exclusive />
+              <span class="card-body"><Icon name="route" size={40} /><b>Help me choose</b><small>Recommend the right places for me.</small></span>
+              <span class="tick" aria-hidden="true"></span>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- 3. Interests -->
+        <fieldset class="pj-step" data-step="2">
+          <legend><span class="pj-q">What would you love to include?</span><span class="pj-hint">Pick anything that interests you.</span></legend>
+          <div class="picks">
+            {interests.map((x) => (
+              <label class="pick">
+                <input type="checkbox" name="interests" value={x.t} />
+                <Icon name={x.icon} size={40} />
+                <span>{x.t}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <!-- 4. Timing -->
+        <fieldset class="pj-step" data-step="3">
+          <legend><span class="pj-q">When, and for how long?</span><span class="pj-hint">Spring (March–May) and autumn (September–November) are the clearest months, but every season has its beauty.</span></legend>
+          <div class="group">
+            <span class="g-lbl">Month of travel</span>
+            <div class="opts">
+              {months.map((m) => <label class="opt"><input type="radio" name="month" value={m} /><span>{m.slice(0, 3)}</span></label>)}
+              <label class="opt"><input type="radio" name="month" value="Flexible" /><span>Flexible</span></label>
+            </div>
+          </div>
+          <div class="group">
+            <span class="g-lbl">Year</span>
+            <div class="opts">
+              {years.map((y) => <label class="opt"><input type="radio" name="year" value={y} /><span>{y}</span></label>)}
+            </div>
+          </div>
+          <div class="group">
+            <span class="g-lbl">Length of stay</span>
+            <div class="opts">
+              {durations.map((d) => <label class="opt"><input type="radio" name="duration" value={d} /><span>{d}</span></label>)}
+            </div>
+          </div>
+          <div class="group">
+            <span class="g-lbl">Pace</span>
+            <div class="cards cards-3 cards-text">
+              {paces.map((p) => (
+                <label class="card card-plain">
+                  <input type="radio" name="pace" value={p.t} />
+                  <span class="card-body"><b>{p.t}</b><small>{p.p}</small></span>
+                  <span class="tick" aria-hidden="true"></span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 5. Travelers & stay -->
+        <fieldset class="pj-step" data-step="4">
+          <legend><span class="pj-q">Who is traveling, and how would you like to stay?</span></legend>
+          <div class="group counters">
+            <div class="counter">
+              <span><b>Adults</b><small>Age 12 and over</small></span>
+              <div class="stepper"><button type="button" data-dec="adults" aria-label="Fewer adults">−</button><input name="adults" type="number" min="1" max="30" value="2" inputmode="numeric" aria-label="Adults" /><button type="button" data-inc="adults" aria-label="More adults">+</button></div>
+            </div>
+            <div class="counter">
+              <span><b>Children</b><small>Under 12</small></span>
+              <div class="stepper"><button type="button" data-dec="children" aria-label="Fewer children">−</button><input name="children" type="number" min="0" max="20" value="0" inputmode="numeric" aria-label="Children" /><button type="button" data-inc="children" aria-label="More children">+</button></div>
+            </div>
+          </div>
+          <div class="group">
+            <span class="g-lbl">A special occasion?</span>
+            <div class="opts">
+              {occasions.map((o) => <label class="opt"><input type="radio" name="occasion" value={o} /><span>{o}</span></label>)}
+            </div>
+          </div>
+          <div class="group">
+            <span class="g-lbl">Accommodation</span>
+            <div class="cards cards-4 cards-text">
+              {accommodation.map((a) => (
+                <label class="card card-plain">
+                  <input type="radio" name="accommodation" value={a.tier} />
+                  <span class="card-body"><Icon name={tierIcon[a.tier] ?? 'bed'} size={36} /><b>{a.tier}</b><small>{a.text}</small></span>
+                  <span class="tick" aria-hidden="true"></span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 6. Details -->
+        <fieldset class="pj-step" data-step="5">
+          <legend><span class="pj-q">Where can we reach you?</span><span class="pj-hint">We reply personally, usually within one working day.</span></legend>
+          <div class="form-grid">
+            <div class="field"><label for="pj-name">Your name *</label><input id="pj-name" name="name" autocomplete="name" required /></div>
+            <div class="field"><label for="pj-email">Email *</label><input id="pj-email" name="email" type="email" autocomplete="email" required /></div>
+            <div class="field"><label for="pj-country">Country of residence</label><input id="pj-country" name="country" autocomplete="country-name" /></div>
+            <div class="field"><label for="pj-phone">Phone / WhatsApp</label><input id="pj-phone" name="phone" type="tel" autocomplete="tel" /></div>
+            <div class="field full"><label for="pj-message">Anything else we should know?</label><textarea id="pj-message" name="notes" placeholder="Dreams, must-sees, dietary needs, mobility, the moments you hope for…"></textarea></div>
+            <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off" /></label></div>
+          </div>
+          <p class="pj-err" role="alert" data-err></p>
+        </fieldset>
+
+        <!-- 7. Review -->
+        <fieldset class="pj-step" data-step="6">
+          <legend><span class="pj-q">Your journey at a glance</span><span class="pj-hint">Check your choices — tap any line to change it.</span></legend>
+          <dl class="review" data-review></dl>
+          <!-- what the worker reads: filled in from the choices above just before sending -->
+          <input type="hidden" name="dates" />
+          <input type="hidden" name="travellers" />
+          <input type="hidden" name="message" />
+        </fieldset>
+
+        <div class="pj-nav">
+          <button type="button" class="btn btn-outline" data-back>← Back</button>
+          <span class="pj-count" data-count></span>
+          <button type="button" class="btn btn-solid" data-next>Continue <span class="arrow">→</span></button>
+          <button type="submit" class="btn btn-solid" data-submit>Send my journey <span class="arrow">→</span></button>
+        </div>
+        <p class="pj-status" role="status" aria-live="polite" data-status></p>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-wizard]')!;
+  const stepEls = [...form.querySelectorAll<HTMLFieldSetElement>('.pj-step')];
+  const dots = [...document.querySelectorAll<HTMLLIElement>('[data-dot]')];
+  const bar = document.querySelector<HTMLElement>('[data-bar]')!;
+  const back = form.querySelector<HTMLButtonElement>('[data-back]')!;
+  const next = form.querySelector<HTMLButtonElement>('[data-next]')!;
+  const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+  const count = form.querySelector<HTMLElement>('[data-count]')!;
+  const err = form.querySelector<HTMLElement>('[data-err]')!;
+  const status = form.querySelector<HTMLElement>('[data-status]')!;
+  const review = form.querySelector<HTMLElement>('[data-review]')!;
+  const DETAILS = 5;
+  const KEY = 'norlha-plan';
+  let current = 0;
+  let reached = 0;
+
+  form.classList.add('is-wizard');
+
+  // ── values ──────────────────────────────────────────────
+  const all = (name: string) => [...form.querySelectorAll<HTMLInputElement>(`[name="${name}"]:checked`)].map((i) => i.value);
+  const one = (name: string) => all(name)[0] ?? '';
+  const val = (name: string) => (form.elements.namedItem(name) as HTMLInputElement | null)?.value.trim() ?? '';
+
+  function summary() {
+    const adults = +val('adults') || 0, children = +val('children') || 0;
+    const when = [one('month'), one('year')].filter(Boolean).join(' ');
+    return [
+      { step: 0, k: 'Travel style', v: one('style') },
+      { step: 1, k: 'Places', v: all('destinations').join(', ') },
+      { step: 2, k: 'Interests', v: all('interests').join(', ') },
+      { step: 3, k: 'When', v: when },
+      { step: 3, k: 'Length of stay', v: one('duration') },
+      { step: 3, k: 'Pace', v: one('pace') },
+      { step: 4, k: 'Travelers', v: `${adults} adult${adults === 1 ? '' : 's'}${children ? `, ${children} child${children === 1 ? '' : 'ren'}` : ''}` },
+      { step: 4, k: 'Occasion', v: one('occasion') },
+      { step: 4, k: 'Accommodation', v: one('accommodation') },
+      { step: 5, k: 'Name', v: val('name') },
+      { step: 5, k: 'Email', v: val('email') },
+      { step: 5, k: 'Country', v: val('country') },
+      { step: 5, k: 'Phone', v: val('phone') },
+      { step: 5, k: 'Notes', v: val('notes') },
+    ];
+  }
+
+  function renderReview() {
+    review.replaceChildren(
+      ...summary().map((r) => {
+        const row = document.createElement('button');
+        row.type = 'button';
+        row.className = 'rv-row';
+        row.dataset.goto = String(r.step);
+        const dt = document.createElement('dt'); dt.textContent = r.k;
+        const dd = document.createElement('dd'); dd.textContent = r.v || '—';
+        if (!r.v) dd.classList.add('empty');
+        row.append(dt, dd);
+        return row;
+      })
+    );
+  }
+
+  // ── navigation ──────────────────────────────────────────
+  function validDetails(focus = true) {
+    const name = form.elements.namedItem('name') as HTMLInputElement;
+    const email = form.elements.namedItem('email') as HTMLInputElement;
+    const bad = !name.value.trim() ? name : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()) ? email : null;
+    err.textContent = bad ? (bad === name ? 'Please tell us your name.' : 'Please enter a valid email address.') : '';
+    if (bad && focus) bad.focus();
+    return !bad;
+  }
+
+  function show(i: number, scroll = true) {
+    if (i > DETAILS && !validDetails()) i = DETAILS;
+    current = Math.max(0, Math.min(stepEls.length - 1, i));
+    reached = Math.max(reached, current);
+    stepEls.forEach((s, n) => { s.hidden = n !== current; });
+    dots.forEach((d, n) => {
+      d.classList.toggle('on', n === current);
+      d.classList.toggle('done', n < current || (n <= reached && n !== current));
+      d.querySelector('button')!.disabled = n > reached;
+      if (n === current) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    bar.style.width = `${(current / (stepEls.length - 1)) * 100}%`;
+    back.style.visibility = current === 0 ? 'hidden' : 'visible';
+    const last = current === stepEls.length - 1;
+    next.hidden = last;
+    submit.hidden = !last;
+    count.textContent = `Step ${current + 1} of ${stepEls.length}`;
+    next.firstChild!.textContent = current === DETAILS ? 'Review ' : current < DETAILS && isEmpty(current) ? 'Skip ' : 'Continue ';
+    if (last) renderReview();
+    if (scroll) document.querySelector('.pj-progress')!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    save();
+  }
+
+  function isEmpty(i: number) {
+    return ![...stepEls[i].querySelectorAll<HTMLInputElement>('input[type=radio],input[type=checkbox]')].some((x) => x.checked);
+  }
+
+  next.addEventListener('click', () => show(current + 1));
+  back.addEventListener('click', () => show(current - 1));
+  document.addEventListener('click', (e) => {
+    const g = (e.target as HTMLElement).closest<HTMLElement>('[data-goto]');
+    if (g && !(g as HTMLButtonElement).disabled) show(+g.dataset.goto!);
+  });
+
+  // Enter in a text field moves forward instead of submitting early
+  form.addEventListener('keydown', (e) => {
+    const t = e.target as HTMLElement;
+    if (e.key === 'Enter' && t.tagName === 'INPUT' && current < stepEls.length - 1) { e.preventDefault(); show(current + 1); }
+  });
+
+  // ── choices ─────────────────────────────────────────────
+  form.addEventListener('change', (e) => {
+    const t = e.target as HTMLInputElement;
+    // "Help me choose" clears specific places, and the other way round
+    if (t.name === 'destinations' && t.checked) {
+      form.querySelectorAll<HTMLInputElement>('[name="destinations"]').forEach((x) => {
+        if (x !== t && (t.hasAttribute('data-exclusive') || x.hasAttribute('data-exclusive'))) x.checked = false;
+      });
+    }
+    if (current === DETAILS && err.textContent) validDetails(false);
+    show(current, false);
+    // single-choice steps move on by themselves
+    if (t.type === 'radio' && t.name === 'style') setTimeout(() => show(1), 280);
+  });
+  // radios can be un-chosen by clicking them again
+  // (a click on a label is re-dispatched to its input, so only the input's own click is handled)
+  form.addEventListener('click', (e) => {
+    const input = e.target as HTMLInputElement;
+    if (input.tagName !== 'INPUT' || input.type !== 'radio') return;
+    if (input.dataset.was === 'true') {
+      input.dataset.was = 'false';
+      setTimeout(() => { input.checked = false; show(current, false); });
+      return;
+    }
+    form.querySelectorAll<HTMLInputElement>(`[name="${input.name}"]`).forEach((x) => (x.dataset.was = 'false'));
+    input.dataset.was = 'true';
+  });
+
+  form.querySelectorAll<HTMLButtonElement>('[data-inc],[data-dec]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const input = form.elements.namedItem(b.dataset.inc || b.dataset.dec!) as HTMLInputElement;
+      const v = (+input.value || 0) + (b.dataset.inc ? 1 : -1);
+      input.value = String(Math.max(+input.min, Math.min(+input.max, v)));
+      save();
+    });
+  });
+
+  // ── remember progress for this visit ────────────────────
+  function save() {
+    try {
+      const data: Record<string, string[]> = {};
+      new FormData(form).forEach((v, k) => { if (k !== 'website') (data[k] ||= []).push(String(v)); });
+      sessionStorage.setItem(KEY, JSON.stringify({ data, current, reached }));
+    } catch {}
+  }
+  function restore() {
+    let saved: { data: Record<string, string[]>; current: number; reached: number } | null = null;
+    try { saved = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch {}
+    const q = new URLSearchParams(location.search);
+    if (saved) {
+      for (const [k, vals] of Object.entries(saved.data)) {
+        form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(`[name="${k}"]`).forEach((el) => {
+          if (el instanceof HTMLInputElement && (el.type === 'radio' || el.type === 'checkbox')) { el.checked = vals.includes(el.value); el.dataset.was = String(el.checked); }
+          else if (!(el instanceof HTMLInputElement && el.type === 'hidden')) el.value = vals[0] ?? '';
+        });
+      }
+      reached = saved.reached || 0;
+      return saved.current || 0;
+    }
+    // Prefill from links such as /plan-your-journey/?style=Family%20Journeys or ?destination=Punakha
+    const pick = (name: string, value: string | null) => {
+      const el = value && [...form.querySelectorAll<HTMLInputElement>(`[name="${name}"]`)].find((x) => x.value.toLowerCase() === value.toLowerCase());
+      if (el) { el.checked = true; el.dataset.was = 'true'; }
+    };
+    pick('style', q.get('style'));
+    pick('destinations', q.get('destination'));
+    return 0;
+  }
+
+  // ── send ────────────────────────────────────────────────
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validDetails()) { show(DETAILS); return; }
+    const s = summary();
+    const get = (k: string) => s.find((r) => r.k === k)?.v ?? '';
+    (form.elements.namedItem('dates') as HTMLInputElement).value = get('When');
+    (form.elements.namedItem('travellers') as HTMLInputElement).value = get('Travelers');
+    (form.elements.namedItem('message') as HTMLInputElement).value = s
+      .filter((r) => r.step < DETAILS && r.v)
+      .map((r) => `${r.k}: ${r.v}`)
+      .concat(val('notes') ? ['', val('notes')] : [])
+      .join('\n');
+
+    submit.disabled = true;
+    status.textContent = 'Sending…';
+    try {
+      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { accept: 'application/json' } });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) throw new Error(data.error || 'Something went wrong.');
+      try { sessionStorage.removeItem(KEY); } catch {}
+      location.href = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/thank-you/`;
+    } catch (error) {
+      status.textContent = `${(error as Error).message} You can also email us directly.`;
+      submit.disabled = false;
+    }
+  });
+
+  show(restore(), false);
+</script>
+
+<style>
+  .pj { background: var(--paper-2); padding: clamp(130px, 16vh, 170px) 0 var(--section); min-height: 100svh; }
+  .pj-wrap { max-width: calc(1040px + var(--gutter) * 2); }
+  .pj-head { text-align: center; max-width: 640px; margin: 0 auto clamp(36px, 5vw, 56px); }
+  .pj-title { font-size: clamp(42px, 5.4vw, 76px); line-height: 1.04; margin: 14px 0 18px; }
+  .pj-title em { color: var(--saffron); }
+  .pj-lede { font-size: 17px; }
+
+  /* progress */
+  .pj-progress { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; scroll-margin-top: 100px; }
+  .pj-progress button { all: unset; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; padding: 6px 0 12px; cursor: pointer; text-align: center; color: var(--ink-mute); transition: color 0.3s var(--ease); }
+  .pj-progress button:disabled { cursor: default; }
+  .pj-progress button:focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
+  .pj-num { font-family: var(--serif); font-size: 22px; line-height: 1; }
+  .pj-lbl { font-family: var(--label); font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .pj-progress .done button { color: var(--ink-soft); }
+  .pj-progress .done button:hover { color: var(--saffron); }
+  .pj-progress .on button { color: var(--saffron); }
+  .pj-bar { height: 2px; background: var(--line); margin-bottom: clamp(36px, 5vw, 56px); }
+  .pj-bar span { display: block; height: 100%; width: 0; background: var(--saffron); transition: width 0.6s var(--ease); }
+  :global(.no-js) .pj-progress, :global(.no-js) .pj-bar, :global(.no-js) [data-next], :global(.no-js) [data-back], :global(.no-js) [data-count], :global(.no-js) [data-step="6"] { display: none; }
+
+  /* steps */
+  .pj-form { background: #fff; padding: clamp(26px, 4.5vw, 60px); box-shadow: 0 30px 60px -40px rgba(25, 18, 8, 0.25); }
+  .pj-step { border: 0; margin: 0; padding: 0; min-width: 0; }
+  :global(.no-js) .pj-step + .pj-step { margin-top: 64px; }
+  .is-wizard .pj-step:not([hidden]) { animation: stepIn 0.55s var(--ease); }
+  @keyframes stepIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  legend { display: block; padding: 0; margin-bottom: 32px; width: 100%; }
+  .pj-q { display: block; font-family: var(--serif); font-size: clamp(28px, 3vw, 42px); line-height: 1.12; color: var(--heading); letter-spacing: -0.02em; }
+  .pj-hint { display: block; margin-top: 10px; font-size: 15.5px; color: var(--ink-soft); }
+
+  /* inputs styled as cards / picks / opts — real radios and checkboxes underneath */
+  .card input, .pick input, .opt input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+
+  .cards { display: grid; gap: 16px; }
+  .cards-3 { grid-template-columns: repeat(3, 1fr); }
+  .cards-4 { grid-template-columns: repeat(4, 1fr); }
+  .card { position: relative; display: flex; flex-direction: column; border: 1px solid var(--line); background: #fff; cursor: pointer; transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), transform 0.4s var(--ease); }
+  .card:hover { border-color: #cfc6b4; transform: translateY(-2px); }
+  .card :global(.card-photo) { aspect-ratio: 4 / 3; }
+  .card-sm :global(.card-photo) { aspect-ratio: 1 / 1; }
+  .card :global(.card-photo img) { transition: transform 1.2s var(--ease); }
+  .card:hover :global(.card-photo img) { transform: scale(1.05); }
+  .card-body { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px 20px; }
+  .card-body b { font-family: var(--serif); font-weight: 400; font-size: 22px; line-height: 1.2; color: var(--heading); }
+  .card-body small { font-size: 14px; line-height: 1.5; color: var(--ink-soft); }
+  .card-plain { background: var(--paper-2); justify-content: center; }
+  .card-plain .card-body { padding: 26px 22px; }
+  .card-plain :global(.icon) { color: var(--saffron); margin-bottom: 8px; }
+  .cards-text .card-body b { font-size: 21px; }
+  .tick { position: absolute; top: 12px; right: 12px; width: 26px; height: 26px; border-radius: 50%; background: rgba(255, 255, 255, 0.92); border: 1px solid var(--line); opacity: 0; transform: scale(0.6); transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); }
+  .tick::after { content: ''; position: absolute; left: 8.5px; top: 5.5px; width: 6px; height: 11px; border: solid #fff; border-width: 0 1.8px 1.8px 0; transform: rotate(45deg); }
+  .card:has(input:checked) { border-color: var(--saffron); box-shadow: 0 0 0 1px var(--saffron); }
+  .card:has(input:checked) .tick { opacity: 1; transform: none; background: var(--saffron); border-color: var(--saffron); }
+  .card:has(input:focus-visible), .pick:has(input:focus-visible), .opt:has(input:focus-visible) { outline: 2px solid var(--saffron); outline-offset: 3px; }
+
+  .picks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .pick { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 150px; padding: 22px 14px; background: #fff; text-align: center; font-family: var(--serif); font-size: 19px; line-height: 1.25; color: var(--heading); cursor: pointer; transition: background 0.3s var(--ease), color 0.3s var(--ease); }
+  .pick :global(.icon) { color: var(--saffron); transition: color 0.3s var(--ease), transform 0.5s var(--ease); }
+  .pick:hover { background: var(--paper-2); }
+  .pick:hover :global(.icon) { transform: translateY(-3px); }
+  .pick:has(input:checked) { background: var(--saffron); color: #fff; }
+  .pick:has(input:checked) :global(.icon) { color: #fff; }
+
+  .group + .group { margin-top: 36px; }
+  .g-lbl { display: block; margin-bottom: 14px; font-family: var(--label); font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+  .opts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .opt span { display: inline-block; padding: 10px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; font-size: 15px; color: var(--ink); cursor: pointer; transition: all 0.3s var(--ease); }
+  .opt:hover span { border-color: var(--saffron); color: var(--saffron); }
+  .opt:has(input:checked) span { background: var(--saffron); border-color: var(--saffron); color: #fff; }
+
+  .counters { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .counter { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 22px; border: 1px solid var(--line); background: var(--paper-2); }
+  .counter > span { display: flex; flex-direction: column; }
+  .counter b { font-family: var(--serif); font-weight: 400; font-size: 22px; color: var(--heading); }
+  .counter small { font-size: 13.5px; color: var(--ink-mute); }
+  .stepper { display: flex; align-items: center; gap: 6px; }
+  .stepper button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #cfc6b4; background: #fff; font-size: 20px; line-height: 1; color: var(--ink); cursor: pointer; transition: all 0.3s var(--ease); }
+  .stepper button:hover { border-color: var(--saffron); color: var(--saffron); }
+  .stepper input { width: 46px; border: 0; background: transparent; text-align: center; font-family: var(--serif); font-size: 24px; color: var(--heading); -moz-appearance: textfield; }
+  .stepper input::-webkit-inner-spin-button, .stepper input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+  .pj-err { margin: 20px 0 0; color: #a3381e; font-size: 15px; }
+  .pj-err:empty { display: none; }
+
+  /* review */
+  .review { margin: 0; border-top: 1px solid var(--line); }
+  .review :global(.rv-row) { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 200px 1fr auto; gap: 20px; width: 100%; padding: 16px 4px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.3s var(--ease); }
+  .review :global(.rv-row::after) { content: 'Edit'; font-family: var(--label); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--saffron); opacity: 0; transition: opacity 0.3s var(--ease); align-self: center; }
+  .review :global(.rv-row:hover), .review :global(.rv-row:focus-visible) { background: var(--paper-2); }
+  .review :global(.rv-row:hover::after), .review :global(.rv-row:focus-visible::after) { opacity: 1; }
+  .review :global(dt) { font-family: var(--label); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mute); padding-top: 3px; }
+  .review :global(dd) { margin: 0; font-family: var(--serif); font-size: 20px; line-height: 1.4; color: var(--heading); white-space: pre-line; }
+  .review :global(dd.empty) { color: var(--ink-mute); }
+
+  /* nav */
+  .pj-nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .pj-count { font-family: var(--label); font-size: 12.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-mute); }
+  .pj-nav [hidden] { display: none; }
+  .pj-nav button:disabled { opacity: 0.6; cursor: wait; }
+  .pj-status { margin: 22px 0 0; font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--ink); text-align: right; }
+  .pj-status:empty { display: none; }
+
+  @media (max-width: 860px) {
+    .cards-3, .cards-4, .picks { grid-template-columns: repeat(2, 1fr); }
+    .pj-lbl { display: none; }
+  }
+  @media (max-width: 560px) {
+    .cards-3 { grid-template-columns: 1fr; }
+    .card-body { padding: 14px 14px 16px; }
+    .card-body b { font-size: 19px; }
+    .card-sm .card-body small { display: none; }
+    .pick { min-height: 124px; font-size: 17px; }
+    .counters { grid-template-columns: 1fr; }
+    .pj-num { font-size: 18px; }
+    .pj-count { display: none; }
+    .review :global(.rv-row) { grid-template-columns: 1fr; gap: 4px; }
+    .review :global(.rv-row::after) { display: none; }
+    .pj-nav .btn { padding: 12px 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .is-wizard .pj-step:not([hidden]) { animation: none; }
+  }
+</style>

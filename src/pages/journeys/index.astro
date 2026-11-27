@@ -1,84 +1,134 @@
 ---
+// Bhutan Journeys — copy: Content & Concept doc, Page 4; accommodation levels: Itinerary doc.
+// Title banner → Bhutan reveals itself slowly (photo collage) → signature journeys (cards)
+// → your journey doesn't have to fit a package (list + photo with numbers) → accommodation levels (icons)
+// → explore Bhutan your way (icon grid of the travel styles) → closing band.
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
-import JourneyCard from '../../components/JourneyCard.astro';
-import StyleCard from '../../components/StyleCard.astro';
+import Photo from '../../components/Photo.astro';
+import Icon from '../../components/Icon.astro';
 import CtaBand from '../../components/CtaBand.astro';
-import { journeys } from '../../data/journeys.js';
+import JourneyCard from '../../components/JourneyCard.astro';
+import { journeys, accommodation } from '../../data/journeys.js';
 import { styles } from '../../data/styles.js';
 
-const signature = journeys.find((j) => j.signature)!;
-const others = journeys.filter((j) => !j.signature);
-const adapt = ['Extend your stay.', 'Change the pace.', 'Add a trek.', 'Spend longer in a valley.', 'Include a festival.', 'Upgrade your accommodation.', 'Create a private celebration.', 'Or start from a completely blank page.'];
+const rows = [...journeys].sort((a, b) => a.days - b.days);
+const adapt = ['Extend your stay', 'Change the pace', 'Add a trek', 'Spend longer in a valley', 'Include a festival', 'Upgrade your accommodation', 'Create a private celebration'];
+const tierIcon: Record<string, string> = { Standard: 'house', Premium: 'star', Luxury: 'diamond', Bespoke: 'feather' };
+const styleIcon: Record<string, string> = {
+  'luxury-bhutan': 'diamond', 'cultural-bhutan': 'temple', 'himalayan-adventures': 'mountain',
+  'romance-and-honeymoons': 'heart', 'family-journeys': 'people', 'wellness-and-stillness': 'lotus',
+};
 ---
 
 <Base title="Bhutan Journeys" description="Five private signature journeys across Bhutan, from 3 to 10 days — thoughtfully curated, flexible by design.">
-  <Hero photo="journeys-hero" alt="A winding mountain road through Bhutan" tone="valley" eyebrow="Bhutan Journeys" title="Discover Bhutan, <em>your way.</em>" sub="Bhutan reveals itself slowly." />
+  <Hero photo="journeys-hero" alt="A winding mountain road through Bhutan" tone="valley" eyebrow="Bhutan Journeys" title="Discover Bhutan, <em>your way.</em>" />
 
+  <!-- Introduction -->
   <section class="section">
-    <div class="wrap split top">
-      <div class="reveal"><p class="lede">Beyond its dramatic mountains lie ancient monasteries, secluded valleys, vibrant festivals, timeless traditions and warm hospitality.</p></div>
-      <div class="reveal">
-        <p class="muted">Our journeys are thoughtfully designed starting points, created to introduce you to the many sides of Bhutan.</p>
-        <p class="pull">Choose a journey that speaks to you, then make it your own.</p>
+    <div class="wrap duo">
+      <div class="duo-media reveal">
+        <Photo name="tigers-nest" alt="Tiger’s Nest Monastery above the Paro Valley" tone="forest" sizes="(max-width: 860px) 75vw, 34vw" />
+        <Photo name="dochula" alt="The chortens of Dochula Pass" tone="snow" sizes="(max-width: 860px) 60vw, 26vw" />
+      </div>
+      <div class="duo-text reveal">
+        <span class="kicker">Discover Bhutan, your way</span>
+        <h2 class="big">Bhutan reveals itself slowly.</h2>
+        <p>Beyond its dramatic mountains lie ancient monasteries, secluded valleys, vibrant festivals, timeless traditions and warm hospitality.</p>
+        <p>Our journeys are thoughtfully designed starting points, created to introduce you to the many sides of Bhutan.</p>
+        <p class="note">Choose a journey that speaks to you, then make it your own.</p>
+        <a href="#signature" class="btn btn-solid">See the journeys <span class="arrow">↓</span></a>
       </div>
     </div>
   </section>
 
+  <!-- Signature journeys -->
   <section class="section bg-2" id="signature">
     <div class="wrap">
-      <div class="head reveal">
-        <span class="eyebrow">Our signature journeys</span>
-        <h2 class="h2" style="margin-top:22px">Private journeys. Thoughtfully curated. <em>Flexible by design.</em></h2>
-      </div>
-
-      <div class="feature reveal"><JourneyCard journey={signature} large /></div>
-
-      <div class="grid grid-2 rest">
-        {others.map((j, i) => <div class="reveal" style={`transition-delay:${(i % 2) * 100}ms`}><JourneyCard journey={j} large /></div>)}
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="wrap">
       <div class="head center reveal">
-        <span class="eyebrow">Explore Bhutan your way</span>
-        <h2 class="h2" style="margin-top:22px">Travel styles, not fixed packages.</h2>
-        <p class="lede">Beyond our signature journeys, discover Bhutan through experiences shaped around your interests, travel style and preferences.</p>
+        <span class="kicker">Our signature journeys · {rows[0].days} to {rows[rows.length - 1].days} days</span>
+        <h2 class="big">Private journeys. Thoughtfully curated. <em>Flexible by design.</em></h2>
       </div>
-      <div class="grid grid-3">
-        {styles.map((s, i) => <div class="reveal" style={`transition-delay:${(i % 3) * 90}ms`}><StyleCard style={s} /></div>)}
+      <div class="cards">
+        {rows.map((j, i) => (
+          <div class="reveal" style={`transition-delay:${(i % 3) * 80}ms`}><JourneyCard journey={j} large /></div>
+        ))}
+        <a href="/plan-your-journey/" class="own reveal" style="transition-delay:160ms">
+          <Icon name="compass" size={56} />
+          <span class="kicker">Tailor-made Bhutan</span>
+          <span class="own-t">No template. No fixed formula. Simply your journey.</span>
+          <span class="link">Customize your journey</span>
+        </a>
       </div>
     </div>
   </section>
 
-  <section class="section bg-pine">
-    <div class="wrap split">
-      <div class="reveal">
-        <span class="eyebrow">Make it yours</span>
-        <h2 class="h2" style="margin:22px 0 28px">Your journey doesn’t have to fit a package.</h2>
-        <p class="lede">Every NorLha journey can be adapted around your interests, preferences and expectations.</p>
-        <a href="/tailor-made/#enquire" class="btn btn-saffron" style="margin-top:36px">Create your journey <span class="arrow">→</span></a>
+  <!-- Make it yours -->
+  <section class="section">
+    <div class="wrap acc">
+      <div class="acc-text reveal">
+        <span class="kicker">Make it yours</span>
+        <h2 class="big">Your journey doesn’t have to fit a package.</h2>
+        <ul class="checks cols">{adapt.map((a) => <li>{a}</li>)}</ul>
+        <p class="note">Or start from a completely blank page.</p>
+        <p>Every NorLha journey can be adapted around your interests, preferences and expectations.</p>
+        <a href="/plan-your-journey/" class="btn btn-solid">Customize your journey <span class="arrow">→</span></a>
       </div>
-      <ul class="adapt reveal">{adapt.map((a) => <li>{a}</li>)}</ul>
+      <div class="acc-media reveal">
+        <Photo name="journeys-cta" alt="A Bhutanese valley at golden hour" tone="dawn" sizes="(max-width: 860px) 90vw, 45vw" />
+        <div class="acc-stats">
+          <div><b>{rows.length}</b><span>Signature journeys to begin from</span></div>
+          <div><b>{rows[0].days}–{rows[rows.length - 1].days}</b><span>Days, or as long as you wish</span></div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <CtaBand title="Not sure where to begin?" text="Tell us a little about yourself and we will suggest a journey — or create one from a blank page." button="Talk to us" photo="journeys-cta" tone="forest" />
+  <!-- Accommodation -->
+  <section class="section bg-tint">
+    <div class="wrap feats">
+      <div class="feats-head reveal">
+        <span class="kicker">Accommodation flexibility</span>
+        <h2 class="big">Every journey, at the level of comfort you prefer.</h2>
+        <p>All journeys are designed to accommodate different travel styles and budgets. Upgrading your accommodation does not require a complete change to the core route.</p>
+      </div>
+      {accommodation.map((a, i) => (
+        <div class="feat reveal" style={`transition-delay:${(i % 2) * 90}ms`}>
+          <Icon name={tierIcon[a.tier] ?? 'star'} size={52} />
+          <h3>{a.tier}</h3>
+          <p>{a.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Travel styles -->
+  <section class="section">
+    <div class="wrap feats three">
+      <div class="feats-head center-head reveal">
+        <span class="kicker">Explore Bhutan your way</span>
+        <h2 class="big">Or begin with a way of traveling.</h2>
+        <p>Beyond our signature journeys, discover Bhutan through experiences shaped around your interests, travel style and preferences.</p>
+      </div>
+      {styles.map((s, i) => (
+        <a href={`/explore/${s.slug}/`} class="feat reveal" style={`transition-delay:${(i % 3) * 80}ms`}>
+          <Icon name={styleIcon[s.slug] ?? 'star'} size={52} />
+          <h3>{s.title}</h3>
+          <span class="f-tag">{s.tags}</span>
+          <p>{s.summary}</p>
+          <span class="link">Read more</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <CtaBand photo="explore-cta" tone="dusk" eyebrow="Begin your journey" title="Bhutan is waiting." text="Tell us what you are looking for, and let us create a journey around it." button="Customize your journey" href="/plan-your-journey/" />
 </Base>
 
 <style>
-  .pull { font-family: var(--serif); font-style: italic; font-size: clamp(24px, 2.4vw, 32px); line-height: 1.35; color: var(--maroon); margin-top: 18px; }
-  .feature { margin-bottom: clamp(56px, 6vw, 80px); }
-  .feature :global(.card) { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0; align-items: stretch; }
-  .feature :global(.media) { aspect-ratio: 16 / 11; }
-  .feature :global(.card) { gap: clamp(32px, 5vw, 72px); align-items: center; }
-  .feature :global(.body) { padding: 0; justify-content: center; }
-  .feature :global(.body h3) { font-size: clamp(28px, 2.6vw, 38px); }
-  .feature :global(.more) { margin-top: 24px; }
-  @media (max-width: 860px) { .feature :global(.card) { grid-template-columns: 1fr; } }
-  .rest { row-gap: clamp(56px, 6vw, 80px); }
-  .adapt li { font-family: var(--serif); font-size: clamp(22px, 2.2vw, 30px); padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .adapt li:last-child { font-style: italic; color: var(--saffron-soft); }
+  .own { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 40px 32px; text-align: center; background: #fff; border: 1px solid var(--line); color: var(--saffron); transition: border-color 0.4s var(--ease); }
+  .own:hover { border-color: var(--saffron); }
+  .own-t { font-family: var(--serif); font-size: clamp(26px, 2.4vw, 34px); line-height: 1.15; color: var(--heading); max-width: 13ch; }
+  .center-head { text-align: center; max-width: 760px; margin: 0 auto; padding: 0; }
+  .acc-text .btn { margin-top: 26px; }
 </style>

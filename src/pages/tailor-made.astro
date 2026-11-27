@@ -1,101 +1,158 @@
 ---
+// Tailor-made — copy: Content & Concept doc, Page 5.
+// Title banner → it begins with a conversation (photo collage + questions) → the process (accordion + photo)
+// → what can your journey include (icon tiles that also fill in the form) → personally curated (statement)
+// → no template, no fixed formula + the enquiry form.
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Photo from '../components/Photo.astro';
+import Icon from '../components/Icon.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 
+const questions = ['What brings you to Bhutan?', 'What do you want to discover?', 'How do you like to travel?', 'What would make your journey memorable?'];
 const steps = [
   { t: 'Tell us what inspires you', p: 'Share your interests, travel dates, preferred pace, expectations and the experiences you have in mind.' },
   { t: 'We curate', p: 'We combine your ideas with our knowledge of Bhutan to create a thoughtful itinerary.' },
   { t: 'Refine', p: 'We adjust the pace, accommodation, experiences and details until the journey feels right.' },
   { t: 'Experience', p: 'Once you arrive, we take care of the journey while you concentrate on being present.' },
 ];
-const includes = ['Culture and heritage', 'Himalayan trekking', 'Wellness and spirituality', 'Photography', 'Food and local cuisine', 'Festivals', 'Wildlife and nature', 'Family experiences', 'Romance and honeymoons', 'Private celebrations', 'Or simply time away from everything'];
+const includes = [
+  { icon: 'temple', t: 'Culture and heritage' },
+  { icon: 'mountain', t: 'Himalayan trekking' },
+  { icon: 'lotus', t: 'Wellness and spirituality' },
+  { icon: 'camera', t: 'Photography' },
+  { icon: 'bowl', t: 'Food and local cuisine' },
+  { icon: 'flags', t: 'Festivals' },
+  { icon: 'leaf', t: 'Wildlife and nature' },
+  { icon: 'people', t: 'Family experiences' },
+  { icon: 'heart', t: 'Romance and honeymoons' },
+  { icon: 'glass', t: 'Private celebrations' },
+  { icon: 'moon', t: 'Time away from everything' },
+];
 ---
 
 <Base title="Tailor-Made Journeys" description="Don't choose a package. Create a journey. Tailor-made private travel in Bhutan, planned with you in four simple steps.">
-  <Hero photo="tailor-hero" alt="A traveler looking out over a Bhutanese valley" tone="dawn" eyebrow="Tailor-made journeys" title="Don’t choose a package. <em>Create a journey.</em>" sub="Your Bhutan. Your way.">
-    <a href="#enquire" class="btn btn-saffron">Start planning <span class="arrow">→</span></a>
-  </Hero>
+  <Hero photo="tailor-hero" alt="A traveler looking out over a Bhutanese valley" tone="dawn" eyebrow="Tailor-made journeys · Your Bhutan. Your way." title="Don’t choose a package. <em>Create a journey.</em>" />
 
+  <!-- It begins with a conversation -->
   <section class="section">
-    <div class="wrap split">
-      <div class="reveal">
-        <span class="eyebrow">It begins with a conversation</span>
-        <p class="lede" style="margin-top:22px">A great journey begins before you arrive. It begins with a conversation.</p>
-        <span class="ornament"></span>
-        <p class="muted">We start there.</p>
+    <div class="wrap duo">
+      <div class="duo-media reveal">
+        <Photo name="hospitality" alt="A warm conversation over tea" tone="dawn" sizes="(max-width: 860px) 75vw, 34vw" />
+        <Photo name="way-curated" alt="Planning a journey through Bhutan" tone="valley" sizes="(max-width: 860px) 60vw, 26vw" />
       </div>
-      <div class="reveal verse questions">
-        <p>What brings you to Bhutan?</p>
-        <p>What do you want to discover?</p>
-        <p>How do you like to travel?</p>
-        <p>What would make your journey memorable?</p>
+      <div class="duo-text reveal">
+        <span class="kicker">It begins with a conversation</span>
+        <h2 class="big">A great journey begins before you arrive.</h2>
+        <ul class="questions">{questions.map((q) => <li>{q}</li>)}</ul>
+        <p class="note">We start there.</p>
       </div>
     </div>
   </section>
 
-  <section class="section bg-pine">
+  <!-- The process -->
+  <section class="section bg-tint">
+    <div class="wrap acc">
+      <div class="acc-text reveal">
+        <span class="kicker">The process</span>
+        <h2 class="big">Four steps to <em>your</em> journey.</h2>
+        <div class="acc-list">
+          {steps.map((st, i) => (
+            <details open={i === 0}>
+              <summary>{st.t}<small>0{i + 1}</small></summary>
+              <p>{st.p}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+      <div class="acc-media reveal">
+        <Photo name="tailor-includes" alt="A private journey through the Bhutanese mountains" tone="dusk" sizes="(max-width: 860px) 90vw, 45vw" />
+        <div class="acc-stats">
+          <div><b>4</b><span>Simple steps, from first idea to arrival</span></div>
+          <div><b>100%</b><span>Private — never part of a group</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What can your journey include -->
+  <section class="section">
     <div class="wrap">
-      <div class="head reveal">
-        <span class="eyebrow">The process</span>
-        <h2 class="h2" style="margin-top:22px">Four steps to your journey.</h2>
+      <div class="head center reveal">
+        <span class="kicker">What can your journey include?</span>
+        <h2 class="big">There is no required formula.</h2>
+        <p class="lede">Choose anything that interests you — we will add it to your enquiry below.</p>
       </div>
-      <ol class="steps">
-        {steps.map((s, i) => (
-          <li class="reveal" style={`transition-delay:${i * 100}ms`}>
-            <span class="sn">0{i + 1}</span>
-            <h3 class="h4">{s.t}</h3>
-            <p>{s.p}</p>
-          </li>
+      <div class="picks" data-picks>
+        {includes.map((x, i) => (
+          <button type="button" class="pick reveal" style={`transition-delay:${(i % 4) * 60}ms`} aria-pressed="false" data-value={x.t}>
+            <Icon name={x.icon} size={44} />
+            <span>{x.t}</span>
+          </button>
         ))}
-      </ol>
+        <a href="#enquire" class="pick pick-more reveal" style="transition-delay:180ms">
+          <Icon name="chat" size={44} />
+          <span>Something else? Tell us below</span>
+        </a>
+      </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="wrap split">
-      <Photo name="tailor-includes" alt="A Bhutanese festival dancer in costume" tone="dzong" class="inc-photo reveal" sizes="(max-width: 860px) 100vw, 50vw" />
+  <!-- Personally curated -->
+  <section class="stmt bg-2">
+    <div class="wrap reveal">
+      <span class="kicker">Your journey, personally curated</span>
+      <h2>You decide what matters. <em>We take care of the details.</em></h2>
+      <div class="lines"><p>We arrange the elements of your journey around your preferences and availability, including accommodation, transportation, guiding and experiences.</p></div>
+    </div>
+  </section>
+
+  <!-- Enquiry -->
+  <section class="section" id="build">
+    <div class="wrap enq">
       <div class="reveal">
-        <span class="eyebrow">What can your journey include?</span>
-        <h2 class="h2" style="margin:22px 0 28px">There is no required formula.</h2>
-        <div class="chips">{includes.map((x) => <span class="chip">{x}</span>)}</div>
-        <span class="ornament"></span>
-        <h3 class="h4">Your journey, personally curated</h3>
-        <p class="muted" style="margin-top:12px">We arrange the elements of your journey around your preferences and availability, including accommodation, transportation, guiding and experiences.</p>
-        <p class="pull">You decide what matters. We take care of the details.</p>
+        <span class="kicker">No template. No fixed formula.</span>
+        <h2 class="big t-gap">Simply <em>your</em> Bhutan.</h2>
+        <p>Tell us as much or as little as you like. We will reply personally with ideas and a first outline of your journey.</p>
+        <ul class="checks">
+          {steps.map((st) => <li>{st.t}</li>)}
+        </ul>
       </div>
-    </div>
-  </section>
-
-  <section class="section bg-2">
-    <div class="wrap split top">
-      <div class="reveal intro">
-        <span class="eyebrow">Start planning</span>
-        <h2 class="h2" style="margin:22px 0 26px">No template. No fixed formula. <em>Simply your Bhutan.</em></h2>
-        <p class="lede">Tell us as much or as little as you like. We will reply personally with ideas and a first outline of your journey.</p>
-      </div>
-      <div class="reveal"><EnquiryForm /></div>
+      <div class="panel form-panel reveal"><EnquiryForm /></div>
     </div>
   </section>
 </Base>
 
+<script>
+  // Interest tiles: write the chosen interests into the first line of the enquiry message.
+  const picks = document.querySelector<HTMLElement>('[data-picks]');
+  const msg = document.querySelector<HTMLTextAreaElement>('#enquire textarea[name="message"]');
+  if (picks && msg) {
+    const PREFIX = 'I am interested in: ';
+    picks.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.pick');
+      if (!btn) return;
+      btn.setAttribute('aria-pressed', btn.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      const chosen = [...picks.querySelectorAll<HTMLButtonElement>('.pick[aria-pressed="true"]')].map((b) => b.dataset.value!.toLowerCase());
+      const rest = msg.value.split('\n').filter((l) => !l.startsWith(PREFIX)).join('\n').replace(/^\n+/, '');
+      msg.value = (chosen.length ? `${PREFIX}${chosen.join(', ')}.\n` : '') + rest;
+    });
+  }
+</script>
+
 <style>
-  .questions p { font-style: italic; }
-  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--line); }
-  .steps li { padding: 36px 28px 8px 0; position: relative; }
-  .steps li + li { padding-left: 28px; border-left: 1px solid var(--line); }
-  .sn { display: block; font-family: var(--serif); font-size: 56px; line-height: 1; color: var(--saffron-soft); margin-bottom: 26px; }
-  .steps h3 { margin-bottom: 14px; }
-  .steps p { color: var(--ink-soft); font-size: 16px; }
-  @media (max-width: 960px) {
-    .steps { grid-template-columns: 1fr 1fr; }
-    .steps li + li:nth-child(3) { border-left: 0; padding-left: 0; }
-  }
-  @media (max-width: 560px) {
-    .steps { grid-template-columns: 1fr; }
-    .steps li, .steps li + li { border-left: 0; padding-left: 0; border-bottom: 1px solid var(--line); padding-bottom: 28px; }
-  }
-  :global(.inc-photo) { aspect-ratio: 4 / 5; }
-  .pull { font-family: var(--serif); font-style: italic; font-size: 26px; color: var(--maroon); margin-top: 22px; }
+  .questions { margin-top: 8px; border-top: 1px solid var(--line); }
+  .questions li { padding: 15px 0; border-bottom: 1px solid var(--line); font-family: var(--serif); font-size: clamp(21px, 1.9vw, 26px); line-height: 1.3; color: var(--heading); }
+  .t-gap { margin: 16px 0 22px; }
+
+  .picks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .pick { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 180px; padding: 28px 18px; border: 0; background: #fff; font-family: var(--serif); font-size: clamp(19px, 1.6vw, 22px); line-height: 1.25; color: var(--heading); cursor: pointer; transition: background 0.35s var(--ease), color 0.35s var(--ease); }
+  .pick :global(.icon) { color: var(--saffron); transition: color 0.35s var(--ease), transform 0.5s var(--ease); }
+  .pick:hover :global(.icon) { transform: translateY(-4px); }
+  .pick:hover { background: var(--paper-2); }
+  .pick[aria-pressed='true'] { background: var(--saffron); color: #fff; }
+  .pick[aria-pressed='true'] :global(.icon) { color: #fff; }
+  .pick-more { font-style: italic; color: var(--saffron); }
+  @media (max-width: 860px) { .picks { grid-template-columns: repeat(2, 1fr); } .pick { min-height: 150px; } }
+  .form-panel { background: var(--paper-2); box-shadow: none; }
 </style>

@@ -1,56 +1,91 @@
 ---
+// The NorLha Way — copy: Content & Concept doc, Page 3 (+ "Travel slowly" verse from Page 1).
+// Title banner → philosophy (photo collage) → the five principles (alternating photo pairs, large numerals)
+// → the moments (statement on tint) → the NorLha difference (photo band).
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Photo from '../components/Photo.astro';
 import CtaBand from '../components/CtaBand.astro';
 
 const principles = [
-  { t: 'Personally curated', photo: 'way-curated', tone: 'dawn', p: ['There is no single way to experience Bhutan.', 'Your journey begins with a conversation about what interests you, how you like to travel, and what you hope to experience.', 'From there, we create.'] },
-  { t: 'Privately experienced', photo: 'way-private', tone: 'valley', p: ['Your time in Bhutan should belong to you.', 'Private arrangements allow you to travel with greater freedom and flexibility, without being tied to a large group’s schedule.', 'Pause when you want. Stay longer when something captures your imagination. Change the rhythm of your day.'] },
-  { t: 'Deeply Bhutanese', photo: 'way-bhutanese', tone: 'dzong', p: ['The most valuable part of Bhutan is not always its most famous landmark. It is the culture behind it.', 'The people. The stories. The traditions. The spirituality. The everyday moments.', 'We create opportunities to experience Bhutan beyond sightseeing.'] },
-  { t: 'Thoughtfully refined', photo: 'way-refined', tone: 'dusk', p: ['Luxury is personal.', 'For some, it is an exceptional hotel surrounded by mountains. For others, it is a private experience, a beautiful meal, or simply having time with nowhere else to be.', 'We focus on the details that make a journey feel comfortable, effortless and special.'] },
-  { t: 'Responsibly experienced', photo: 'way-responsible', tone: 'forest', p: ['Bhutan’s natural and cultural heritage deserves respect.', 'We encourage our travelers to engage thoughtfully with local communities, traditions and the environment.', 'Because discovering a place should also mean helping preserve what makes it special.'] },
+  { t: 'Personally curated', photo: 'way-curated', tone: 'dawn', lead: 'There is no single way to experience Bhutan.', p: ['Your journey begins with a conversation about what interests you, how you like to travel, and what you hope to experience.'], end: 'From there, we create.' },
+  { t: 'Privately experienced', photo: 'way-private', tone: 'valley', lead: 'Your time in Bhutan should belong to you.', p: ['Private arrangements allow you to travel with greater freedom and flexibility, without being tied to a large group’s schedule.'], list: ['Pause when you want.', 'Stay longer when something captures your imagination.', 'Change the rhythm of your day.'] },
+  { t: 'Deeply Bhutanese', photo: 'way-bhutanese', tone: 'dzong', lead: 'The most valuable part of Bhutan is not always its most famous landmark.', p: ['It is the culture behind it.'], list: ['The people.', 'The stories.', 'The traditions.', 'The spirituality.', 'The everyday moments.'], end: 'We create opportunities to experience Bhutan beyond sightseeing.' },
+  { t: 'Thoughtfully refined', photo: 'way-refined', tone: 'dusk', lead: 'Luxury is personal.', p: ['For some, it is an exceptional hotel surrounded by mountains. For others, it is a private experience, a beautiful meal, or simply having time with nowhere else to be.', 'We focus on the details that make a journey feel comfortable, effortless and special.'] },
+  { t: 'Responsibly experienced', photo: 'way-responsible', tone: 'forest', lead: 'Bhutan’s natural and cultural heritage deserves respect.', p: ['We encourage our travelers to engage thoughtfully with local communities, traditions and the environment.'], end: 'Because discovering a place should also mean helping preserve what makes it special.' },
 ];
+const moments = ['A quiet morning in the mountains.', 'A conversation with a local family.', 'An ancient monastery reached by a forest path.', 'A beautifully prepared Bhutanese meal.', 'The changing light across a Himalayan valley.'];
 ---
 
 <Base title="The NorLha Way" description="Travel slowly. Discover deeply. The five principles behind every NorLha journey in Bhutan.">
-  <Hero photo="way-hero" alt="Clouds drifting through a Himalayan valley" tone="snow" eyebrow="The NorLha Way" title="Travel slowly. <em>Discover deeply.</em>" sub="We believe the finest journeys are not about how much ground you cover. They are about how deeply you experience a place." />
+  <Hero photo="way-hero" alt="Clouds drifting through a Himalayan valley" tone="snow" eyebrow="The NorLha Way" title="Travel slowly. <em>Discover deeply.</em>" />
 
-  <section class="section-tight">
-    <div class="wrap-narrow center reveal">
-      <p class="verse">That belief shapes every NorLha journey.</p>
-    </div>
-  </section>
-
-  {principles.map((x, i) => (
-    <section class:list={['principle', { alt: i % 2 === 1 }]}>
-      <div class="wrap split">
-        <Photo name={x.photo} alt={x.t} tone={x.tone} class="pp reveal" sizes="(max-width: 860px) 100vw, 50vw" />
-        <div class="reveal">
-          <span class="big-num">0{i + 1}</span>
-          <h2 class="h2">{x.t}</h2>
-          <span class="ornament"></span>
-          {x.p.map((p, k) => <p class:list={[k === 0 ? 'lede' : 'muted']}>{p}</p>)}
-        </div>
+  <!-- Philosophy -->
+  <section class="section">
+    <div class="wrap duo">
+      <div class="duo-media reveal">
+        <Photo name="himalaya" alt="Himalayan peaks above Bhutan" tone="snow" sizes="(max-width: 860px) 75vw, 34vw" />
+        <Photo name="prayer-flags" alt="Prayer flags moving in the wind" tone="dawn" sizes="(max-width: 860px) 60vw, 26vw" />
       </div>
-    </section>
-  ))}
-
-  <section class="section bg-pine">
-    <div class="wrap-narrow center reveal">
-      <span class="eyebrow">The NorLha difference</span>
-      <h2 class="h2" style="margin-top:24px">We don’t simply arrange a trip to Bhutan. <em>We create a way for you to experience it.</em></h2>
+      <div class="duo-text reveal">
+        <span class="kicker">Our philosophy</span>
+        <h2 class="big">The finest journeys are not about how much ground you cover.</h2>
+        <p>They are about how deeply you experience a place.</p>
+        <p>That belief shapes every NorLha journey — in five simple principles.</p>
+        <ul class="checks">
+          {principles.map((x) => <li>{x.t}</li>)}
+        </ul>
+      </div>
     </div>
   </section>
 
-  <CtaBand title="Begin with a conversation." text="Tell us how you like to travel, and we will take it from there." photo="way-cta" tone="dusk" />
+  <!-- Five principles -->
+  <section class="section bg-2">
+    <div class="wrap pr-list">
+      {principles.map((x, i) => (
+        <article class:list={['pr', { flip: i % 2 === 1 }]}>
+          <div class="pr-media reveal">
+            <Photo name={x.photo} alt={x.t} tone={x.tone} sizes="(max-width: 860px) 100vw, 46vw" />
+            <span class="pr-no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          </div>
+          <div class="pr-text reveal">
+            <span class="kicker">{String(i + 1).padStart(2, '0')} — Principle</span>
+            <h2 class="big">{x.t}</h2>
+            <p class="pr-lead">{x.lead}</p>
+            {x.p.map((p) => <p>{p}</p>)}
+            {x.list && <ul class="checks">{x.list.map((l) => <li>{l}</li>)}</ul>}
+            {x.end && <p class="note">{x.end}</p>}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- Moments -->
+  <section class="stmt">
+    <div class="wrap reveal">
+      <span class="kicker">Bhutan rewards those who take their time</span>
+      <h2>These moments cannot always be found on an itinerary. <em>They happen when you have the freedom to travel well.</em></h2>
+      <div class="lines">{moments.map((m) => <p>{m}</p>)}</div>
+    </div>
+  </section>
+
+  <CtaBand photo="way-cta" tone="dusk" eyebrow="The NorLha difference" title="We don’t simply arrange a trip to Bhutan. We create a way for you to experience it." button="Begin with a conversation" />
 </Base>
 
 <style>
-  .principle { padding: clamp(60px, 8vw, 110px) 0; }
-  .principle.alt { background: var(--paper-2); }
-  .principle.alt :global(.pp) { order: 2; }
-  .principle :global(.pp) { aspect-ratio: 5 / 4; }
-  .big-num { display: block; font-family: var(--serif); font-style: italic; font-size: 64px; line-height: 1; color: var(--saffron); margin-bottom: 18px; }
-  @media (max-width: 860px) { .principle.alt :global(.pp) { order: 0; } }
+  .pr-list { display: flex; flex-direction: column; gap: clamp(90px, 11vw, 160px); }
+  .pr { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(40px, 7vw, 110px); align-items: center; }
+  .pr.flip .pr-media { order: 2; }
+  .pr-media { position: relative; }
+  .pr-media :global(.photo) { aspect-ratio: 4 / 4.6; }
+  .pr-no { font-variant-numeric: lining-nums; position: absolute; bottom: -0.38em; right: -0.08em; font-family: var(--serif); font-size: clamp(110px, 13vw, 200px); line-height: 1; color: var(--paper-2); -webkit-text-stroke: 1px var(--saffron); paint-order: stroke fill; pointer-events: none; }
+  .pr.flip .pr-no { right: auto; left: -0.08em; }
+  .pr-text h2 { margin: 16px 0 22px; }
+  .pr-lead { font-family: var(--serif); font-size: clamp(22px, 2vw, 27px); line-height: 1.35; color: var(--heading); }
+  @media (max-width: 860px) {
+    .pr { grid-template-columns: 1fr; }
+    .pr.flip .pr-media { order: 0; }
+    .pr-media :global(.photo) { aspect-ratio: 4 / 3.4; }
+  }
 </style>

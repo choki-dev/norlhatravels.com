@@ -1,117 +1,140 @@
 ---
+// About NorLha — copy: Content & Concept doc, Page 2 (+ accommodation levels from the Itinerary doc).
+// Title banner → who we are (photo collage) → the NorLha approach (icon grid) → travel with freedom
+// → comfort without compromising character (accordion + photo) → our promise (statement) → photo strip → CTA.
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Photo from '../components/Photo.astro';
+import Icon from '../components/Icon.astro';
 import CtaBand from '../components/CtaBand.astro';
-import { accommodation } from '../data/journeys.js';
+import { accommodation, journeys } from '../data/journeys.js';
+import { destinations } from '../data/destinations.js';
 
 const approach = [
-  { t: 'We listen', p: ['Every traveler arrives with a different idea of Bhutan. Some come for culture. Some for the mountains. Some for spirituality. Some for adventure. Others simply want to slow down.', 'We begin by understanding what Bhutan means to you.'] },
-  { t: 'We curate', p: ['We then shape an itinerary around your interests, pace, travel style and expectations.', 'The journey can be refined until it feels right.'] },
-  { t: 'We connect', p: ['Bhutan is best experienced through its people.', 'Our journeys create opportunities to discover local culture, traditions, stories, food, crafts and everyday life.'] },
-  { t: 'We coordinate', p: ['Behind every effortless journey is careful planning.', 'We coordinate accommodation, transportation, guiding, activities and the many details that make your time in Bhutan comfortable and seamless.'] },
+  { icon: 'chat', t: 'We listen', p: 'Every traveler arrives with a different idea of Bhutan. Some come for culture. Some for the mountains. Some for spirituality. Some for adventure. Others simply want to slow down. We begin by understanding what Bhutan means to you.' },
+  { icon: 'compass', t: 'We curate', p: 'We then shape an itinerary around your interests, pace, travel style and expectations. The journey can be refined until it feels right.' },
+  { icon: 'people', t: 'We connect', p: 'Bhutan is best experienced through its people. Our journeys create opportunities to discover local culture, traditions, stories, food, crafts and everyday life.' },
+  { icon: 'route', t: 'We coordinate', p: 'Behind every effortless journey is careful planning. We coordinate accommodation, transportation, guiding, activities and the many details that make your time in Bhutan comfortable and seamless.' },
+];
+const choices = [
+  { icon: 'hourglass', t: 'Choice of pace' },
+  { icon: 'star', t: 'Choice of experiences' },
+  { icon: 'bed', t: 'Choice of accommodation' },
+  { icon: 'clock', t: 'Choice of how you spend your time' },
+];
+const promise = [
+  'To travel through its landscapes with time to appreciate them.',
+  'To understand its traditions.',
+  'To meet its people.',
+  'To discover places beyond the obvious.',
+  'And to return home with memories that feel distinctly your own.',
 ];
 ---
 
 <Base title="About NorLha" description="NorLha Tours & Travels creates private journeys for travelers who want to experience Bhutan personally, thoughtfully and at their own pace.">
   <Hero photo="about-hero" alt="A Bhutanese dzong set against forested mountains" tone="forest" eyebrow="About NorLha" title="Bhutan is our destination. <em>Your journey is our focus.</em>" />
 
+  <!-- Who we are -->
   <section class="section">
-    <div class="wrap split">
-      <div class="reveal verse">
-        <p>Bhutan is not simply somewhere to visit.</p>
-        <p><em>It is a country to experience.</em></p>
+    <div class="wrap duo">
+      <div class="duo-media reveal">
+        <Photo name="temple-light" alt="Butter lamps glowing inside a Bhutanese temple" tone="dzong" sizes="(max-width: 860px) 75vw, 34vw" />
+        <Photo name="hospitality" alt="Bhutanese hospitality — tea served in a traditional home" tone="dawn" sizes="(max-width: 860px) 60vw, 26vw" />
       </div>
-      <div class="reveal">
-        <p class="lede">Its mountains, monasteries, villages, traditions, spirituality and people each reveal a different part of the Kingdom.</p>
-        <p class="muted">At NorLha Tours and Travels, we create private journeys for travelers who want to experience Bhutan personally, thoughtfully and at their own pace.</p>
-        <p class="muted">Our approach begins with a simple idea:</p>
-        <p class="idea">Listen first. Then create.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section bg-pine">
-    <div class="wrap">
-      <div class="head reveal">
-        <span class="eyebrow">The NorLha approach</span>
-        <h2 class="h2" style="margin-top:22px">Four simple commitments.</h2>
-      </div>
-      <div class="grid grid-4">
-        {approach.map((a, i) => (
-          <div class="pillar reveal" style={`transition-delay:${i * 90}ms`}>
-            <span class="num">0{i + 1}</span>
-            <h3>{a.t}</h3>
-            {a.p.map((p) => <p>{p}</p>)}
-          </div>
-        ))}
+      <div class="duo-text reveal">
+        <span class="kicker">Who we are</span>
+        <h2 class="big">Bhutan is not simply somewhere to visit. It is a country to experience.</h2>
+        <p>Its mountains, monasteries, villages, traditions, spirituality and people each reveal a different part of the Kingdom.</p>
+        <p>At NorLha Tours and Travels, we create private journeys for travelers who want to experience Bhutan personally, thoughtfully and at their own pace.</p>
+        <p class="note">Our approach begins with a simple idea: listen first. Then create.</p>
+        <a href="/the-norlha-way/" class="btn btn-solid">The NorLha Way <span class="arrow">→</span></a>
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="wrap split">
-      <Photo name="freedom" alt="A traveler pausing on a forest trail in Bhutan" tone="valley" class="tall reveal" sizes="(max-width: 860px) 100vw, 50vw" />
-      <div class="reveal">
-        <span class="eyebrow">Travel with freedom</span>
-        <h2 class="h2" style="margin:22px 0 28px">We believe private travel should give you choice.</h2>
-        <ul class="choices">
-          <li>Choice of pace.</li>
-          <li>Choice of experiences.</li>
-          <li>Choice of accommodation.</li>
-          <li>Choice of how you spend your time.</li>
-        </ul>
-        <p class="muted">Rather than asking you to fit into a predetermined journey, we create the journey around you.</p>
-      </div>
-    </div>
-  </section>
-
+  <!-- The NorLha approach -->
   <section class="section bg-2">
-    <div class="wrap">
-      <div class="head reveal">
-        <span class="eyebrow">Comfort without compromising character</span>
-        <h2 class="h2" style="margin-top:22px">The right balance of comfort, privacy, authenticity and flexibility.</h2>
-        <p class="lede">From intimate boutique properties to distinguished luxury hotels and retreats, we can arrange accommodation according to your preferences, itinerary and availability. The same applies to transportation and guiding.</p>
+    <div class="wrap feats">
+      <div class="feats-head reveal">
+        <span class="kicker">The NorLha approach</span>
+        <h2 class="big">Listen first. <em>Then create.</em></h2>
+        <p>Four simple commitments sit behind every NorLha journey — from the first conversation to the moment you leave Bhutan.</p>
       </div>
-      <div class="grid grid-4">
-        {accommodation.map((a, i) => (
-          <div class="tier reveal" style={`transition-delay:${i * 90}ms`}>
-            <span class="eyebrow">{String(i + 1).padStart(2, '0')}</span>
-            <h3 class="h4">{a.tier}</h3>
-            <p class="muted">{a.text}</p>
-          </div>
-        ))}
-      </div>
+      {approach.map((a, i) => (
+        <div class="feat reveal" style={`transition-delay:${(i % 2) * 90}ms`}>
+          <Icon name={a.icon} size={52} />
+          <h3>{a.t}</h3>
+          <p>{a.p}</p>
+        </div>
+      ))}
     </div>
   </section>
 
+  <!-- Travel with freedom -->
   <section class="section">
-    <div class="wrap-narrow center reveal">
-      <span class="eyebrow">Our promise</span>
-      <h2 class="h2" style="margin:22px 0 32px">We don’t want to simply show you Bhutan. <em>We want to help you experience it.</em></h2>
-      <div class="verse promise">
-        <p>To travel through its landscapes with time to appreciate them.</p>
-        <p>To understand its traditions.</p>
-        <p>To meet its people.</p>
-        <p>To discover places beyond the obvious.</p>
-        <p>And to return home with memories that feel distinctly your own.</p>
+    <div class="wrap feats center">
+      <div class="feats-head reveal">
+        <span class="kicker">Travel with freedom</span>
+        <h2 class="big">We believe private travel should give you <em>choice.</em></h2>
       </div>
-      <span class="ornament"></span>
-      <p class="eyebrow">Your Bhutan. Your way.</p>
-      <div style="margin-top:40px"><a href="/the-norlha-way/" class="link">Read the NorLha Way <span>→</span></a></div>
+      {choices.map((c, i) => (
+        <div class="feat reveal" style={`transition-delay:${i * 80}ms`}>
+          <Icon name={c.icon} size={52} />
+          <h3>{c.t}</h3>
+        </div>
+      ))}
+    </div>
+    <p class="wrap-narrow center note freedom reveal">Rather than asking you to fit into a predetermined journey, we create the journey around you.</p>
+  </section>
+
+  <!-- Comfort without compromising character -->
+  <section class="section bg-tint">
+    <div class="wrap acc">
+      <div class="acc-text reveal">
+        <span class="kicker">Where you stay</span>
+        <h2 class="big">Comfort without compromising character.</h2>
+        <p>From intimate boutique properties to distinguished luxury hotels and retreats, we can arrange accommodation according to your preferences, itinerary and availability. The same applies to transportation and guiding.</p>
+        <p>Your journey should have the right balance of comfort, privacy, authenticity and flexibility.</p>
+        <div class="acc-list">
+          {accommodation.map((a, i) => (
+            <details open={i === 0}>
+              <summary>{a.tier}</summary>
+              <p>{a.text}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+      <div class="acc-media reveal">
+        <Photo name="luxury" alt="A refined hotel room looking out over a Bhutanese valley" tone="dusk" sizes="(max-width: 860px) 90vw, 45vw" />
+        <div class="acc-stats">
+          <div><b>{journeys.length}</b><span>Signature journeys, each one adaptable</span></div>
+          <div><b>{destinations.length}</b><span>Destinations, west to east</span></div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <CtaBand title="Let us create a journey <em>around you.</em>" text="Tell us what Bhutan means to you, and we will shape the rest." photo="about-cta" tone="dawn" />
+  <!-- Our promise -->
+  <section class="stmt">
+    <div class="wrap reveal">
+      <span class="kicker">Our promise</span>
+      <h2>We don’t want to simply show you Bhutan. <em>We want to help you experience it.</em></h2>
+      <div class="lines">{promise.map((l) => <p>{l}</p>)}</div>
+    </div>
+  </section>
+
+  <div class="strip reveal">
+    <Photo name="prayer-flags" alt="Prayer flags on a mountain pass" tone="snow" sizes="(max-width: 760px) 50vw, 25vw" />
+    <Photo name="punakha-dzong" alt="Punakha Dzong at the meeting of two rivers" tone="valley" sizes="(max-width: 760px) 50vw, 35vw" />
+    <Photo name="culture-2" alt="Bhutanese cultural life" tone="dzong" sizes="(max-width: 760px) 50vw, 20vw" />
+    <Photo name="tigers-nest" alt="Tiger’s Nest Monastery on its cliff above Paro" tone="forest" sizes="(max-width: 760px) 50vw, 26vw" />
+  </div>
+
+  <div class="gap"></div>
+  <CtaBand photo="about-cta" tone="dusk" eyebrow="Your Bhutan. Your way." title="Tell us what you are looking for, and let us create a journey around it." />
 </Base>
 
 <style>
-  .idea { font-family: var(--serif); font-style: italic; font-size: clamp(28px, 3vw, 40px); color: var(--maroon); margin-top: 14px; }
-  :global(.tall) { aspect-ratio: 4 / 5; }
-  .choices { margin-bottom: 28px; }
-  .choices li { font-family: var(--serif); font-size: clamp(24px, 2.2vw, 30px); padding: 12px 0; border-bottom: 1px solid var(--line); }
-  .tier { background: var(--paper); padding: 34px 30px; border-top: 2px solid var(--saffron); }
-  .tier h3 { margin: 12px 0 14px; }
-  .tier p { font-size: 15.5px; }
-  .promise { font-size: clamp(20px, 1.9vw, 25px); color: var(--ink-soft); }
+  .freedom { margin-top: clamp(48px, 6vw, 72px); }
+  .gap { height: clamp(80px, 9vw, 130px); }
 </style>

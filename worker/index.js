@@ -1,5 +1,7 @@
 // Cloudflare Worker: handles POST /api/enquiry and serves everything else from static assets.
-const FIELDS = ['name', 'email', 'country', 'phone', 'dates', 'duration', 'travellers', 'style', 'accommodation', 'journey', 'message'];
+const FIELDS = ['name', 'email', 'country', 'phone', 'dates', 'duration', 'travellers', 'style', 'accommodation', 'journey', 'message',
+  // extra answers from the step-by-step journey builder (/plan-your-journey/)
+  'destinations', 'interests', 'month', 'year', 'pace', 'adults', 'children', 'occasion', 'notes'];
 
 export default {
   async fetch(request, env) {
@@ -15,7 +17,7 @@ export default {
       if (form.get('website')) return json({ ok: true });
 
       const data = {};
-      for (const k of FIELDS) data[k] = String(form.get(k) ?? '').trim().slice(0, 4000);
+      for (const k of FIELDS) data[k] = form.getAll(k).map((v) => String(v).trim()).filter(Boolean).join(', ').slice(0, 4000);
 
       if (!data.name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
         return json({ ok: false, error: 'Please share your name and a valid email address.' }, 422);

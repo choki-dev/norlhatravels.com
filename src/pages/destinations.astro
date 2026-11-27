@@ -1,61 +1,71 @@
 ---
+// Destinations — copy: Content & Concept doc, Page 6.
+// Title banner → Bhutan changes as you travel (photo collage) → the map → the eight places as a
+// staggered two-column gallery (links such as /destinations/#paro land on each) → closing band.
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Photo from '../components/Photo.astro';
+import BhutanMap from '../components/BhutanMap.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { destinations } from '../data/destinations.js';
+
+const changes = ['The landscape changes.', 'The architecture changes.', 'The climate changes.', 'And so does the rhythm of life.'];
 ---
 
 <Base title="Destinations" description="Paro, Thimphu, Punakha, Phobjikha, Bumthang, Haa, Trongsa and Eastern Bhutan — discover the places that fit your journey.">
   <Hero photo="destinations-hero" alt="Terraced fields and a river valley in Bhutan" tone="valley" eyebrow="Destinations" title="The many faces <em>of Bhutan.</em>" />
 
+  <!-- Introduction -->
   <section class="section">
-    <div class="wrap split">
-      <div class="reveal verse">
-        <p>Bhutan changes as you travel.</p>
-        <p class="muted">The landscape changes. The architecture changes. The climate changes.</p>
-        <p><em>And so does the rhythm of life.</em></p>
+    <div class="wrap duo">
+      <div class="duo-media reveal">
+        <Photo name="paro-valley" alt="The Paro Valley" tone="dawn" sizes="(max-width: 860px) 75vw, 34vw" />
+        <Photo name="phobjikha" alt="The Phobjikha Valley" tone="forest" sizes="(max-width: 860px) 60vw, 26vw" />
       </div>
-      <div class="reveal">
-        <p class="lede">Rather than rushing through every destination, we help you discover the places that best fit your journey.</p>
-        <nav class="jump" aria-label="Destinations">
-          {destinations.map((d) => <a href={`#${d.id}`} class="chip">{d.name}</a>)}
-        </nav>
+      <div class="duo-text reveal">
+        <span class="kicker">The many faces of Bhutan</span>
+        <h2 class="big">Bhutan changes as you travel.</h2>
+        <div class="lines">{changes.map((c) => <p>{c}</p>)}</div>
+        <p class="after">Rather than rushing through every destination, we help you discover the places that best fit your journey.</p>
+        <a href="#places" class="btn btn-solid">Explore the places <span class="arrow">↓</span></a>
       </div>
     </div>
   </section>
 
-  {destinations.map((d, i) => (
-    <section class:list={['dest', { alt: i % 2 === 1 }]} id={d.id}>
-      <div class="wrap split">
-        <Photo name={d.photo} alt={d.name} tone={d.tone} class="dp reveal" sizes="(max-width: 860px) 100vw, 55vw" />
-        <div class="reveal">
-          <span class="idx">{String(i + 1).padStart(2, '0')} / {String(destinations.length).padStart(2, '0')}</span>
-          <h2 class="h1">{d.name}</h2>
-          <span class="eyebrow kicker">{d.kicker}</span>
-          {d.text.map((t, k) => <p class:list={[k === 0 ? 'lede' : 'muted']}>{t}</p>)}
-          <a href={`/tailor-made/?destination=${encodeURIComponent(d.name)}#enquire`} class="link" style="margin-top:18px">{d.cta} <span>→</span></a>
-        </div>
+  <!-- Map -->
+  <section class="section bg-2 map-sec">
+    <div class="wrap">
+      <div class="head center reveal">
+        <span class="kicker">West to east</span>
+        <h2 class="big">From Haa to the far east of the Kingdom.</h2>
+        <p class="lede">Choose a place on the map to read more about it.</p>
       </div>
-    </section>
-  ))}
+      <BhutanMap />
+    </div>
+  </section>
 
-  <CtaBand eyebrow="Find the places that fit you" title="You don’t need to see all of Bhutan. <em>You need to discover the Bhutan that speaks to you.</em>" button="Create your journey" photo="destinations-cta" tone="dusk" />
+  <!-- The places -->
+  <section class="section" id="places">
+    <div class="wrap stagger">
+      {destinations.map((d, i) => (
+        <article class="st-item reveal" id={d.id}>
+          <Photo name={d.photo} alt={d.name} tone={d.tone} sizes="(max-width: 760px) 100vw, 48vw" />
+          <div class="st-body">
+            <span class="kicker">{String(i + 1).padStart(2, '0')} · {d.kicker}</span>
+            <h3>{d.name}</h3>
+            {d.text.map((t: string) => <p>{t}</p>)}
+            <a href={`/tailor-made/?destination=${encodeURIComponent(d.name)}#enquire`} class="link">{d.cta}</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <CtaBand photo="destinations-cta" tone="valley" eyebrow="Find the places that fit you" title="You don’t need to see all of Bhutan. You need to discover the Bhutan that speaks to you." button="Create your journey" />
 </Base>
 
 <style>
-  .jump { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
-  .jump a:hover { border-color: var(--saffron); color: var(--ink); }
-  .dest { padding: clamp(60px, 8vw, 110px) 0; scroll-margin-top: 60px; }
-  .dest.alt { background: var(--paper-2); }
-  .dest .split { grid-template-columns: 1.15fr 1fr; }
-  .dest.alt .split { grid-template-columns: 1fr 1.15fr; }
-  .dest.alt :global(.dp) { order: 2; }
-  .dest :global(.dp) { aspect-ratio: 5 / 4; }
-  .idx { display: block; font-size: 12px; letter-spacing: 0.22em; color: var(--ink-mute); margin-bottom: 18px; }
-  .kicker { display: block; margin: 18px 0 26px; }
-  @media (max-width: 860px) {
-    .dest .split, .dest.alt .split { grid-template-columns: 1fr; }
-    .dest.alt :global(.dp) { order: 0; }
-  }
+  .after { margin-top: 24px; }
+  .map-sec { padding-bottom: clamp(60px, 7vw, 100px); }
+  [id] { scroll-margin-top: 120px; }
 </style>

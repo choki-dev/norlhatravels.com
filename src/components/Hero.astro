@@ -1,6 +1,6 @@
 ---
 // Full-size hero: just the brand name in wide-tracked serif capitals and the tagline in fine gold caps.
-// Inner-page heroes: centred title over a darkened photo with a small breadcrumb.
+// Inner-page heroes: a page-title banner — eyebrow, serif title and breadcrumb centred over a softly darkened photo.
 import Photo from './Photo.astro';
 interface Props {
   photo: string;
@@ -15,13 +15,13 @@ interface Props {
   /** Optional slideshow: several photos that crossfade in turn (the first one loads eagerly). */
   slides?: { photo: string; alt: string; tone?: any }[];
 }
-const { photo, alt, tone, eyebrow, title, tagline, sub, size = 'tall', slides } = Astro.props;
+const { photo, alt, tone, eyebrow, title, tagline, sub, size = 'tall', align = 'left', slides } = Astro.props;
 const show = slides && slides.length > 1 ? slides : null;
 // Breadcrumb from the path, without the GitHub Pages base (/norlhatravels.com)
 const crumb = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, '').length).split('/').filter(Boolean);
 ---
 
-<section class:list={['hero', `hero-${size}`, 'on-dark']}>
+<section class:list={['hero', `hero-${size}`, `align-${align}`, 'on-dark']}>
   {show ? (
     <div class="slides" data-slides aria-roledescription="slideshow" aria-label="Photographs of Bhutan">
       {show.map((s, i) => (
@@ -48,20 +48,26 @@ const crumb = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, '
       </div>
     </div>
   ) : (
-    <div class="content wrap">
+    <div class="content">
       {eyebrow && <span class="eyebrow">{eyebrow}</span>}
       <h1 class="h1" set:html={title.replace('|', ' ')} />
       {sub && <p class="sub-c">{sub}</p>}
-      <div class="actions center-actions"><slot /></div>
-      {crumb.length > 0 && (
+      {Astro.slots.has('default') && <div class="actions"><slot /></div>}
+      {crumb.length > 0 && align !== 'center' && (
         <nav class="crumbs" aria-label="Breadcrumb">
           <a href="/">Home</a>
-          {crumb.map((c) => <><span>/</span><span>{c.replace(/-/g, ' ')}</span></>)}
+          {crumb.map((c, i) => (
+            <>
+              <span class="sep" aria-hidden="true">/</span>
+              {i < crumb.length - 1 ? <a href={`/${crumb.slice(0, i + 1).join('/')}/`}>{c.replace(/-/g, ' ')}</a> : <span aria-current="page">{c.replace(/-/g, ' ')}</span>}
+            </>
+          ))}
         </nav>
       )}
     </div>
   )}
 </section>
+{size !== 'full' && <span id="hero-end" class="hero-end"></span>}
 
 <script>
   // Hero slideshow: crossfade to the next photo every few seconds; the dots jump to a photo.
@@ -168,22 +174,58 @@ const crumb = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, '
     color: var(--saffron-soft);
   }
 
-  /* Inner-page hero */
-  .content { position: relative; text-align: center; padding-top: 140px; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; }
-  .eyebrow { color: #fff; margin-bottom: 18px; opacity: 0.9; }
-  .content h1 { color: #fff; max-width: 18ch; }
-  .content h1 :global(em) { font-style: italic; }
-  .sub-c { margin-top: 22px; max-width: 46ch; font-size: 18px; color: rgba(255, 255, 255, 0.86); }
-  .center-actions { margin-top: 32px; justify-content: center; }
-  .crumbs { margin-top: 34px; display: flex; gap: 10px; font-size: 13px; text-transform: capitalize; color: rgba(255, 255, 255, 0.75); }
+  /* Inner-page hero — a page-title banner (in the manner of boutique resort sites):
+     eyebrow, serif title and a fine breadcrumb, centred over an evenly darkened photo */
+  .hero-tall { min-height: 64svh; align-items: center; }
+  .hero-medium { min-height: 52svh; align-items: center; }
+  .hero-tall .shade, .hero-medium .shade {
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 55%, rgba(16, 12, 8, 0.32) 0%, rgba(16, 12, 8, 0) 75%),
+      linear-gradient(180deg, rgba(16, 12, 8, 0.45) 0%, rgba(16, 12, 8, 0.28) 40%, rgba(16, 12, 8, 0.4) 100%);
+  }
+  .content {
+    position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 150px clamp(20px, 5vw, 96px) clamp(56px, 8vh, 90px);
+  }
+  .content h1 { margin: 0 auto; }
+  .sub-c { margin-left: auto !important; margin-right: auto !important; }
+  .actions { justify-content: center; }
+  .crumbs { margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; font-family: var(--label); font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255, 255, 255, 0.72); }
   .crumbs a:hover { color: #fff; }
+  .crumbs .sep { opacity: 0.5; }
+  .crumbs [aria-current] { color: #fff; }
+  .content > * { opacity: 0; animation: rise 1.6s var(--ease) forwards; }
+  .content > :nth-child(2) { animation-delay: 0.15s; }
+  .content > :nth-child(3) { animation-delay: 0.3s; }
+  .content > :nth-child(4) { animation-delay: 0.45s; }
+  .content > :nth-child(5) { animation-delay: 0.6s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  /* same lettering as the home tagline: fine, wide-tracked gold capitals */
+  .eyebrow { font-family: var(--sans); font-size: clamp(11.5px, 1vw, 13px); font-weight: 500; letter-spacing: 0.38em; text-transform: uppercase; color: var(--saffron-soft); margin-bottom: 20px; }
+  .content h1 { color: #fff; max-width: 20ch; font-size: clamp(40px, 5vw, 72px); line-height: 1.08; text-shadow: 0 2px 40px rgba(0, 0, 0, 0.2); }
+  .content h1 :global(em) { font-style: italic; }
+  .sub-c { margin: 20px 0 0; max-width: 46ch; font-size: 17px; line-height: 1.6; color: rgba(255, 255, 255, 0.85); }
+  .actions { margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-end { display: block; height: 0; }
+
+  /* Centred variant (404, thank-you): whole screen, message in the middle */
+  .align-center.hero-tall { min-height: 100svh; align-items: center; }
+  .align-center .content { align-items: center; text-align: center; padding-bottom: 80px; }
+  .align-center .content h1 { margin: 0 auto; }
+  .align-center .sub-c { margin-left: auto; margin-right: auto; }
+  .align-center .actions { justify-content: center; }
+
+  @media (max-width: 560px) {
+    .content { padding-top: 130px; }
+    .eyebrow { letter-spacing: 0.26em; }
+  }
 
   @media (max-width: 560px) {
     .brand-name { --ls: 0.22em; }
     .tagline { --ls: 0.32em; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .lockup > * { animation: none; opacity: 1; }
+    .lockup > *, .content > * { animation: none; opacity: 1; }
     .hero :global(.hero-photo img) { animation: none; }
     .hero :global(.slide img) { transition: none; transform: none; }
   }
